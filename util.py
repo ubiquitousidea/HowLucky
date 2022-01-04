@@ -68,10 +68,10 @@ class Randomize(object):
 
 def sleep_random(m, s):
     """
-    sleep for a random time
-    :param m:
-    :param s:
-    :return:
+    sleep for a random time (rectified normal distribution)
+    :param m: mean
+    :param s: standard deviation
+    :return: None
     """
     n = abs(normal(m, s, 1)[0])
     print(f'sleeping {round(n,2)} seconds')
@@ -117,15 +117,15 @@ def write_rows(df, tbl):
                 f"VALUES ({fmt})\n"
                 f"ON CONFLICT DO NOTHING")
             query = validate_query(query)
-            cur.execute(query, row.values)
+            cur.execute(query, values=row.values)  # use values argument to prevent sql injection
     return None
 
 
 def make_condition_string(col_name, value):
     """
     construct sql condition string.
-        if single value, result is of the form: col=value.
-        if list, use col in (values...)
+        if single value, result is of the form: 'col=value'.
+        if list, use 'col in (values...)'
     :param col_name: name of the column where condition applies
     :param value: str or list of str, matching value(s)
     :return: sql string

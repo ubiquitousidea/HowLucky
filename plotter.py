@@ -55,7 +55,9 @@ def make_artist_plot():
     produce a plot representing each artist in the data
     :return: Figure
     """
-    return go.Figure()
+    fig = go.Figure()
+
+    return fig
 
 
 @figure_style
