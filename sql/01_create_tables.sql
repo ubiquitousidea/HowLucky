@@ -83,7 +83,6 @@ TABLESPACE pg_default;
 ALTER TABLE IF EXISTS public.marketplace
     OWNER to dsnyder;
 
-
 -- View: public.prices
 
 -- DROP VIEW public.prices;
@@ -104,6 +103,7 @@ CREATE OR REPLACE VIEW public.prices
     releases.master_id
    FROM marketplace
      JOIN releases USING (release_id)
+  WHERE marketplace."when" IS NOT NULL AND marketplace.lowest_price IS NOT NULL
   ORDER BY releases.artist, releases.title, marketplace."when";
 
 ALTER TABLE public.prices

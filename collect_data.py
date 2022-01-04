@@ -10,6 +10,9 @@ import discogs_client
 import time
 
 
+MAXCALLS = 200
+
+
 app_keys = load_yaml('keys/appdata.yaml')
 token_info = load_yaml('keys/my_token.yaml')
 
@@ -37,7 +40,7 @@ for item in Randomize(collection):
     store_release_data(release, owned=True)
     time.sleep(2)
     idx += 1
-    if idx > 50:
+    if idx > MAXCALLS:
         break
 
 # -----------------------------------------------------------------------------
@@ -51,5 +54,5 @@ for item in Randomize(wantlist):
     store_release_data(release, owned=False)
     time.sleep(2)
     idx += 1
-    if idx > 50:
+    if idx > MAXCALLS:
         break
