@@ -9,7 +9,7 @@ from util import load_yaml, store_release_data, Randomize, sleep_random
 import discogs_client
 
 
-MAXCALLS = 50
+MAXCALLS = 200
 
 
 app_keys = load_yaml('keys/appdata.yaml')

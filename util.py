@@ -117,7 +117,7 @@ def write_rows(df, tbl):
                 f"VALUES ({fmt})\n"
                 f"ON CONFLICT DO NOTHING")
             query = validate_query(query)
-            cur.execute(query, values=row.values)  # use values argument to prevent sql injection
+            cur.execute(query, row.values)
     return None
 
 
