@@ -7,7 +7,8 @@ from numpy import where, array
 LAYOUT_STYLE = dict(
     paper_bgcolor='rgba(0,0,0,0)',
     plot_bgcolor='rgba(0,0,0,0)',
-    clickmode='event+select'
+    clickmode='event+select',
+    dragmode='select'
 )
 
 
@@ -117,4 +118,6 @@ def make_timeseries_plot(**conditions):
             '# for Sale: %{customdata[2]}'
         )
     )
+    y_max = 1.05 * df['lowest_price'].astype(float).max()
+    fig.update_yaxes(range=[0, y_max])
     return fig

@@ -1,10 +1,12 @@
+import time
 import yaml
 import psycopg2
 import pandas as pd
+import discogs_client
 from yaml import Loader, Dumper
 from secrets import token_urlsafe
-import discogs_client
-from numpy.random import permutation
+from numpy.random import permutation, normal
+from numpy import abs
 
 
 # -----------------------------------------------------------------------------
@@ -37,6 +39,11 @@ def write_yaml(data, fname):
     return None
 
 
+# -----------------------------------------------------------------------------
+# - randomizing functions -----------------------------------------------------
+# -----------------------------------------------------------------------------
+
+
 def make_random_password(_bytes=16):
     """
     create a random password
@@ -57,6 +64,19 @@ class Randomize(object):
     def __iter__(self):
         for i in permutation(self.n):
             yield self.iterable[i]
+
+
+def sleep_random(m, s):
+    """
+    sleep for a random time
+    :param m:
+    :param s:
+    :return:
+    """
+    n = abs(normal(m, s, 1)[0])
+    print(f'sleeping {round(n,2)} seconds')
+    time.sleep(n)
+    return None
 
 
 # -----------------------------------------------------------------------------

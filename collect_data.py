@@ -5,12 +5,11 @@ Analyze the data
 Display the data
 """
 
-from util import load_yaml, store_release_data, Randomize
+from util import load_yaml, store_release_data, Randomize, sleep_random
 import discogs_client
-import time
 
 
-MAXCALLS = 200
+MAXCALLS = 50
 
 
 app_keys = load_yaml('keys/appdata.yaml')
@@ -38,7 +37,7 @@ idx = 0
 for item in Randomize(collection):
     release = item.release
     store_release_data(release, owned=True)
-    time.sleep(2)
+    sleep_random(3, .5)
     idx += 1
     if idx > MAXCALLS:
         break
@@ -52,7 +51,7 @@ idx = 0
 for item in Randomize(wantlist):
     release = item.release
     store_release_data(release, owned=False)
-    time.sleep(2)
+    sleep_random(3, .5)
     idx += 1
     if idx > MAXCALLS:
         break
