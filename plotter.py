@@ -98,6 +98,7 @@ def make_album_plot():
 @figure_style
 def make_timeseries_plot(**conditions):
     df = get_release_data(**conditions)
+    df['country'].fillna('-', inplace=True)
     fig = px.line(
         df,
         x='when',
