@@ -7,6 +7,7 @@ from dash import dcc
 from dash import html
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
+from numpy import where, array
 import dash_bootstrap_components as dbc
 import webbrowser
 from plotly.graph_objects import Layout, Figure
@@ -16,7 +17,7 @@ from plotter import (
     make_artist_plot,
     make_album_plot,
     make_timeseries_plot,
-    ARTIST_INDEX, RELEASE_INDEX, LAYOUT_STYLE
+    LAYOUT_STYLE
 )
 
 
@@ -60,13 +61,15 @@ app.layout = dbc.Container([
         dbc.Col([
             dcc.Graph(
                 id='graph1',
-                style={'height': '70vh', 'width': '33vw'})
+                style={'height': '70vh', 'width': '33vw'}),
+            dcc.Store(id='graph1_custom_data')
         ]),
         dbc.Col([
             dcc.Graph(
                 id='graph2',
                 figure=Figure(layout=Layout(**LAYOUT_STYLE)),
-                style={'height': '70vh', 'width': '63vw'})
+                style={'height': '70vh', 'width': '63vw'}),
+            dcc.Store(id='graph2_custom_data')
         ])
     ])
 ], fluid=True, id='main_container', style=MAIN_STYLE)
@@ -74,38 +77,45 @@ app.layout = dbc.Container([
 
 @app.callback(
     Output('graph1', 'figure'),
+    Output('graph1_custom_data', 'data'),
     Input('entity_dropdown', 'value'))
 def update_graph1(entity):
+
     if entity == 'country':
-        fig = make_country_plot()
+        plot_func = make_country_plot
     elif entity == 'label':
-        fig = make_label_plot()
+        plot_func = make_label_plot
     elif entity == 'artist':
-        fig = make_artist_plot()
+        plot_func = make_artist_plot
     elif entity == 'album':
-        fig = make_album_plot()
+        plot_func = make_album_plot
     else:
         raise PreventUpdate
-    return fig
+
+    return plot_func()
 
 
 @app.callback(
     Output('graph2', 'figure'),
+    Output('graph2_custom_data', 'data'),
     Input('graph1', 'selectedData'),
-    State('entity_dropdown', 'value'))
-def update_graph2(traces, entity):
+    State('entity_dropdown', 'value'),
+    State('graph1_custom_data', 'data'))
+def update_graph2(traces, entity, custom_data_labels):
     if traces is None:
         raise PreventUpdate
     if entity == 'album':
-        release_ids = [point['customdata'][RELEASE_INDEX] for point in traces['points']]
+        release_index = where(array(custom_data_labels) == 'release_id')[0][0]
+        release_ids = [point['customdata'][release_index] for point in traces['points']]
         conditions = {'release_id': release_ids}
     elif entity == 'artist':
-        artist_ids = [point['customdata'][ARTIST_INDEX] for point in traces['points']]
+        artist_index = where(array(custom_data_labels) == 'artist_id')[0][0]
+        artist_ids = [point['customdata'][artist_index] for point in traces['points']]
         conditions = {'artist_id': artist_ids}
     else:
         conditions = {}
-    fig = make_timeseries_plot(**conditions)
-    return fig
+
+    return make_timeseries_plot(**conditions)
 
 
 if __name__ == '__main__':
