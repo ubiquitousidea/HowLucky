@@ -7,6 +7,7 @@ from yaml import Loader, Dumper
 from secrets import token_urlsafe
 from numpy.random import permutation, normal
 from numpy import abs
+from PIL import Image
 
 
 # -----------------------------------------------------------------------------
@@ -249,3 +250,14 @@ def get_releases():
     :return: pandas data frame
     """
     return read_rows(RELEASE_TABLE)
+
+
+# -----------------------------------------------------------------------------
+# - visual things -------------------------------------------------------------
+# -----------------------------------------------------------------------------
+
+
+class Colormaker(object):
+    def __init__(self, image):
+        assert isinstance(image, )
+        self.img = image

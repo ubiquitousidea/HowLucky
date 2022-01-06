@@ -35,7 +35,7 @@ ENTITY_OPTIONS = [
 
 MAIN_STYLE = {
     'font-family': 'helvetica',
-    'background-color': '#555555',
+    'background-color': '#222222',
     'min-height': '100vh',
     'min-width': '100vw',
 }
@@ -43,7 +43,7 @@ MAIN_STYLE = {
 
 app.layout = dbc.Container([
     dbc.Row([
-        html.H1('Record Collection Analyzer')
+        html.H1('Record Collection Analyzer', style={'color': '#EEEEEE'})
     ]),
     dbc.Row([
         dbc.Col([
@@ -52,7 +52,8 @@ app.layout = dbc.Container([
                 options=ENTITY_OPTIONS,
                 value='album',
                 multi=False,
-                clearable=False
+                clearable=False,
+                style={'background-color': '#444444', 'text-color': '#CCCCCC'}
             )
         ], width=4),
         dbc.Col(width=8)

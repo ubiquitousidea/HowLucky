@@ -6,6 +6,15 @@ from util import get_release_data
 LAYOUT_STYLE = dict(
     paper_bgcolor='rgba(0,0,0,0)',
     plot_bgcolor='rgba(0,0,0,0)',
+    font_color='#CCCCCC',
+    yaxis_tickprefix='$',
+    yaxis_tickformat=',.2f',
+    xaxis_tickfont_color='#CCCCCC',
+    yaxis_tickfont_color='#CCCCCC',
+    xaxis_zeroline=False,
+    yaxis_zeroline=False,
+    yaxis_gridcolor='#666666',
+    xaxis_gridcolor='#666666',
     clickmode='event+select',
     dragmode='select'
 )
@@ -68,7 +77,11 @@ def make_artist_plot():
         color='count',
         custom_data=groupings,
         log_x=True,
-        log_y=True
+        log_y=True,
+        labels={
+            'num_for_sale': 'Number for Sale',
+            'lowest_price': 'Lowest Price'
+        }
     )
     fig.update_traces(
         hovertemplate=(
@@ -106,7 +119,11 @@ def make_album_plot():
         color='count',
         custom_data=groupings,
         log_x=True,
-        log_y=True
+        log_y=True,
+        labels={
+            'num_for_sale': 'Number for Sale',
+            'lowest_price': 'Lowest Price'
+        }
     )
     fig.update_traces(
         hovertemplate=(
