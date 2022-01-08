@@ -257,7 +257,7 @@ def get_releases():
 # -----------------------------------------------------------------------------
 
 
-class Colormaker(object):
-    def __init__(self, image):
-        assert isinstance(image, )
-        self.img = image
+# class Colormaker(object):
+#     def __init__(self, image):
+#         assert isinstance(image, )
+#         self.img = image

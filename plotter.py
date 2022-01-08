@@ -81,7 +81,8 @@ def make_artist_plot():
         labels={
             'num_for_sale': 'Number for Sale',
             'lowest_price': 'Lowest Price'
-        }
+        },
+        title='Artists: Price vs. Supply'
     )
     fig.update_traces(
         hovertemplate=(
@@ -123,7 +124,8 @@ def make_album_plot():
         labels={
             'num_for_sale': 'Number for Sale',
             'lowest_price': 'Lowest Price'
-        }
+        },
+        title='Albums: Price vs Supply'
     )
     fig.update_traces(
         hovertemplate=(
@@ -153,7 +155,8 @@ def make_timeseries_plot(**conditions):
             'when': 'Date Time',
             'lowest_price': 'Lowest Price',
             'country': 'Country'
-        }
+        },
+        title="Album Prices over Time"
     )
     fig.update_traces(
         hovertemplate=(

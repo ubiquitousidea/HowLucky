@@ -3,77 +3,25 @@ create a dashboard to view and analyze the collected data
 """
 
 import dash
-from dash import dcc
-from dash import html
 from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
-from numpy import where, array
 import dash_bootstrap_components as dbc
 import webbrowser
-from plotly.graph_objects import Layout, Figure
+from numpy import where, array
+from layout import page_layout, layout_1
 from plotter import (
     make_country_plot,
     make_label_plot,
     make_artist_plot,
     make_album_plot,
     make_timeseries_plot,
-    LAYOUT_STYLE
+
 )
 
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = 'Collection Analyzer'
-
-
-ENTITY_OPTIONS = [
-    {'label': 'Country', 'value': 'country'},
-    {'label': 'Label', 'value': 'label'},
-    {'label': 'Artist', 'value': 'artist'},
-    {'label': 'Album', 'value': 'album'}
-]
-
-
-MAIN_STYLE = {
-    'font-family': 'helvetica',
-    'background-color': '#222222',
-    'min-height': '100vh',
-    'min-width': '100vw',
-}
-
-
-app.layout = dbc.Container([
-    dbc.Row([
-        html.H1('Record Collection Analyzer', style={'color': '#EEEEEE'})
-    ]),
-    dbc.Row([
-        dbc.Col([
-            dcc.Dropdown(
-                id='entity_dropdown',
-                options=ENTITY_OPTIONS,
-                value='album',
-                multi=False,
-                clearable=False,
-                style={'background-color': '#444444', 'text-color': '#CCCCCC'}
-            )
-        ], width=4),
-        dbc.Col(width=8)
-    ]),
-    dbc.Row([
-        dbc.Col([
-            dcc.Graph(
-                id='graph1',
-                style={'height': '70vh', 'width': '33vw'}),
-            dcc.Store(id='graph1_custom_data')
-        ]),
-        dbc.Col([
-            dcc.Graph(
-                id='graph2',
-                figure=Figure(layout=Layout(**LAYOUT_STYLE)),
-                style={'height': '70vh', 'width': '63vw'}),
-            dcc.Store(id='graph2_custom_data')
-        ])
-    ])
-], fluid=True, id='main_container', style=MAIN_STYLE)
+app.layout = layout_1  # page_layout
 
 
 @app.callback(
