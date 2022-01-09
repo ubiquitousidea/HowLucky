@@ -37,7 +37,7 @@ idx = 0
 for item in Randomize(collection):
     release = item.release
     store_release_data(release, owned=True)
-    sleep_random(3, .5)
+    sleep_random()
     idx += 1
     if idx > MAXCALLS:
         break
@@ -51,7 +51,7 @@ idx = 0
 for item in Randomize(wantlist):
     release = item.release
     store_release_data(release, owned=False)
-    sleep_random(3, .5)
+    sleep_random()
     idx += 1
     if idx > MAXCALLS:
         break

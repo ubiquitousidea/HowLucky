@@ -5,7 +5,7 @@ import pandas as pd
 import discogs_client
 from yaml import Loader, Dumper
 from secrets import token_urlsafe
-from numpy.random import permutation, normal
+from numpy.random import permutation, normal, exponential
 from numpy import abs
 from PIL import Image
 
@@ -67,15 +67,13 @@ class Randomize(object):
             yield self.iterable[i]
 
 
-def sleep_random(m, s):
+def sleep_random():
     """
-    sleep for a random time (rectified normal distribution)
-    :param m: mean
-    :param s: standard deviation
+    sleep for a random time (exponential distributed)
     :return: None
     """
-    n = abs(normal(m, s, 1)[0])
-    print(f'sleeping {round(n,2)} seconds')
+    n = exponential(2, 1)[0]
+    print(f'sleeping {round(n, 2)} seconds')
     time.sleep(n)
     return None
 
@@ -241,7 +239,9 @@ def get_release_data(**conditions):
     get marketplace data from the local database for releases matching certain conditions
     :return: pandas data frame
     """
-    return read_rows(PRICES_VIEW, **conditions)
+    df = read_rows(PRICES_VIEW, **conditions)
+    df['country'].fillna('-', inplace=True)
+    return df
 
 
 def get_releases():
