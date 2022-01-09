@@ -125,12 +125,12 @@ def make_album_plot():
 @figure_style
 def make_timeseries_plot(**conditions):
     df = get_release_data(**conditions)
-    custom_data = ['artist', 'title', 'num_for_sale']
+    custom_data = ['artist', 'title', 'num_for_sale', 'year']
     fig = px.line(
         df,
         x='when',
         y='lowest_price',
-        color='country',
+        color='year',
         line_group='release_id',
         custom_data=custom_data,
         markers=True,
@@ -145,9 +145,11 @@ def make_timeseries_plot(**conditions):
         hovertemplate=(
             '<b>Artist</b>: %{customdata[0]}<br>'
             '<b>Album</b>: %{customdata[1]}<br>'
+            '<b>Year</b>: %{customdata[3]}<br>'
             'Date: %{x}<br>'
             'Lowest Price: %{y:$.2f}<br>'
             '# for Sale: %{customdata[2]}'
+
         )
     )
     y_max = 1.05 * df['lowest_price'].astype(float).max()
