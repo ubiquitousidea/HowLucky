@@ -241,6 +241,49 @@ def prepare_release_data(release):
     return pd.DataFrame(output, index=[0])
 
 
+def prepare_label_data(release):
+    """
+    prepare the label information and release-label links
+    :param release: Release object
+    :return: dict of release_id/label_id pairs, dict of labels
+    """
+    rid = release.id
+    labels = release.labels
+    n_labels = len(labels)
+    labels = [{
+        'label_id': label.id,
+        'name': label.name,
+        'profile': label.profile,
+        'image': label.images[0]['uri']
+    } for label in labels]
+    label_release = [{
+        'release_id': rid, 'label_id': label['label_id']
+    } for label in labels]
+    return (
+        pd.DataFrame(label_release, index=range(n_labels)),
+        pd.DataFrame(labels, index=range(n_labels))
+    )
+
+
+def prepare_artist_data(release):
+    rid = release.id
+    artists = release.artists
+    n_artists = len(artists)
+    artists = [{
+        'artist_id': artist.id,
+        'name': artist.name,
+        'profile': artist.profile,
+        'url': artist.images[0]['uri']
+    } for artist in artists]
+    artist_release = [{
+        'artist_id': artist['artist_id'], 'release_id': rid
+    } for artist in artists]
+    return (
+        pd.DataFrame(artist_release, index=range(n_artists)),
+        pd.DataFrame(artists, index=range(n_artists))
+    )
+
+
 # -----------------------------------------------------------------------------
 # - Database write functions --------------------------------------------------
 # -----------------------------------------------------------------------------
@@ -250,32 +293,23 @@ def store_release_data(release):
     """
     store the marketplace stats and release info for a release
     :param release: Release object
-    :param owned: boolean, whether or not the title is currently in the collection
     :return: None
     """
     assert isinstance(release, discogs_client.Release), f'release is {type(release)}'
     print(f'Storing marketplace data for: {release.title} by {release.artists[0].name}')
-
-    # store release
-    # store prices
-    # store artists
-    # store labels
-    # store artist-release connections
-    # store label-release connections
-
     try:
-
-        write_rows(
-            prepare_price_data(release),
-            tbl=MARKETPLACE_TABLE)
-        write_rows(
-            prepare_release_data(release),
-            tbl=RELEASE_TABLE)
-
+        marketplace_data = prepare_price_data(release)
+        release_info = prepare_release_data(release)
+        label_release, labels = prepare_label_data(release)
+        artist_release, artists = prepare_artist_data(release)
+        write_rows(marketplace_data, MARKETPLACE_TABLE)
+        write_rows(release_info, RELEASE_TABLE)
+        write_rows(label_release, E_LABEL_RELEASE)
+        write_rows(labels, LABEL_TABLE)
+        write_rows(artist_release, E_ARTIST_RELEASE)
+        write_rows(artists, ARTIST_TABLE)
     except:
-
         pass
-
     return None
 
 

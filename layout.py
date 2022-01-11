@@ -30,7 +30,7 @@ MEASURE_OPTIONS = [
 
 
 RADIO_STYLE_ARGS = dict(
-    style={'margin': '10px'},
+    style={'margin': '2px'},
     labelStyle={'color': '#fff', 'margin': '5px'},
     inputStyle={'margin': '5px'}
 )
@@ -41,21 +41,19 @@ class Options(dbc.Container):
         self._title = title
         dbc.Container.__init__(self, id=f'{id}_container', *args, **kwargs)
         self.children = [
-            dbc.Container([
-                dbc.Row([
-                    dbc.Col([
-                        html.H4(title, style={'color': '#fff'})
-                    ], width=4),
-                    dbc.Col([
-                        dcc.RadioItems(
-                            id=id,
-                            options=options,
-                            value=options[default_option]['value'],
-                            **RADIO_STYLE_ARGS
-                        )
-                    ])
-                ], justify='start')
-            ])
+            dbc.Row([
+                dbc.Col([
+                    html.H4(title, style={'color': '#fff'})
+                ], width=4),
+                dbc.Col([
+                    dcc.RadioItems(
+                        id=id,
+                        options=options,
+                        value=options[default_option]['value'],
+                        **RADIO_STYLE_ARGS
+                    )
+                ])
+            ], justify='start')
         ]
 
 
