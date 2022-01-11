@@ -154,7 +154,7 @@ def make_album_plot(x_measure='median', y_measure='median'):
 
 
 @figure_style
-def make_timeseries_plot(**conditions):
+def make_timeseries_plot(color_var, **conditions):
     df = get_release_data(**conditions)
     custom_data = ['artist', 'title', 'num_for_sale', 'year']
     fig = px.line(
@@ -162,7 +162,7 @@ def make_timeseries_plot(**conditions):
         x='when',
         y='lowest_price',
         line_group='release_id',
-        color='year',
+        color=color_var,
         custom_data=custom_data,
         labels={
             'when': 'Date Time',

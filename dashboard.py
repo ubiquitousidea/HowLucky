@@ -60,14 +60,22 @@ def update_graph2(traces, entity, custom_data_labels):
         release_index = where(array(custom_data_labels) == 'release_id')[0][0]
         release_ids = [point['customdata'][release_index] for point in traces['points']]
         conditions = {'release_id': release_ids}
+        color_var = 'title'
     elif entity == 'artist':
         artist_index = where(array(custom_data_labels) == 'artist_id')[0][0]
         artist_ids = [point['customdata'][artist_index] for point in traces['points']]
         conditions = {'artist_id': artist_ids}
+        color_var = 'artist'
+    elif entity == 'country':
+        country_index = where(array(custom_data_labels) == 'country')[0][0]
+        country_names = [point['customdata'][country_index] for point in traces['points']]
+        conditions = {'country': country_names}
+        color_var = 'country'
     else:
         conditions = {}
+        color_var = 'year'
 
-    return make_timeseries_plot(**conditions)
+    return make_timeseries_plot(color_var, **conditions)
 
 
 if __name__ == '__main__':

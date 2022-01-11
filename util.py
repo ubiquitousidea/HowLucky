@@ -145,6 +145,7 @@ def make_condition_string(col_name, value):
     :return: sql string
     """
     if isinstance(value, (list, tuple)):
+        value = list(set(value))  # use only unique values
         quoted_values = [f"'{val}'" for val in value]
         value_list = '(' + ','.join(quoted_values) + ')'
         _output = f"{col_name} in {value_list}"
