@@ -190,7 +190,7 @@ CREATE OR REPLACE VIEW public.prices
      JOIN artists ON artists.artist_id = artist_release.artist_id
      JOIN labels ON label_release.label_id = labels.label_id
   WHERE marketplace."when" IS NOT NULL AND marketplace.lowest_price IS NOT NULL
-  ORDER BY releases.artist, releases.title, marketplace."when";
+  ORDER BY artists.name, releases.title, marketplace."when";
 
 ALTER TABLE public.prices
     OWNER TO dsnyder;
