@@ -5,9 +5,25 @@ import pandas as pd
 import discogs_client
 from yaml import Loader, Dumper
 from secrets import token_urlsafe
-from numpy.random import permutation, normal, exponential
-from numpy import abs
-from PIL import Image
+from numpy.random import permutation, exponential
+
+
+SCHEMA_NAME = 'public'
+
+# historial price data table
+MARKETPLACE_TABLE = 'marketplace'
+
+# node tables
+RELEASE_TABLE = 'releases'
+ARTIST_TABLE = 'artists'
+LABEL_TABLE = 'labels'
+
+# edge tables
+E_ARTIST_RELEASE = 'artist_release'
+E_LABEL_RELEASE = 'label_release'
+
+# views
+PRICES_VIEW = 'prices'
 
 
 # -----------------------------------------------------------------------------
@@ -83,12 +99,6 @@ def sleep_random():
 # -----------------------------------------------------------------------------
 
 
-SCHEMA_NAME = 'public'
-MARKETPLACE_TABLE = 'marketplace'
-RELEASE_TABLE = 'releases'
-PRICES_VIEW = 'prices'
-
-
 def validate_query(query):
     """
     validate SQL query and return a potentially modified query
@@ -116,7 +126,12 @@ def write_rows(df, tbl):
                 f"VALUES ({fmt})\n"
                 f"ON CONFLICT DO NOTHING")
             query = validate_query(query)
-            cur.execute(query, row.values)
+            try:
+                cur.execute(query, row.values)
+            except psycopg2.ProgrammingError as e:
+                print({'query': query})
+                print({'values': row})
+                raise e
     return None
 
 
@@ -165,17 +180,15 @@ def read_rows(tbl, **conditions):
 # -----------------------------------------------------------------------------
 
 
-def prepare_price_data(release, owned):
+def prepare_price_data(release):
     """
     prepare data frame of price data from Release object
     :param release: Release object
-    :param owned:
     :return: pandas data frame
     """
     stats = release.marketplace_stats
     output = {
-        'release_id': release.id,
-        'owned': owned
+        'release_id': release.id
     }
     try:
         output.update({
@@ -197,10 +210,9 @@ def prepare_release_data(release):
     output = {
         'release_id': release.id,
         'title': release.title,
-        'artist': release.artists[0].name,
-        'artist_id': release.artists[0].id,
         'year': release.year,
-        'country': release.country
+        'country': release.country,
+        'format': release.formats[0]['name']
     }
     try:
         output.update({
@@ -216,7 +228,7 @@ def prepare_release_data(release):
 # -----------------------------------------------------------------------------
 
 
-def store_release_data(release, owned=False):
+def store_release_data(release):
     """
     store the marketplace stats and release info for a release
     :param release: Release object
@@ -225,12 +237,27 @@ def store_release_data(release, owned=False):
     """
     assert isinstance(release, discogs_client.Release), f'release is {type(release)}'
     print(f'Storing marketplace data for: {release.title} by {release.artists[0].name}')
-    write_rows(
-        prepare_price_data(release, owned),
-        tbl=MARKETPLACE_TABLE)
-    write_rows(
-        prepare_release_data(release),
-        tbl=RELEASE_TABLE)
+
+    # store release
+    # store prices
+    # store artists
+    # store labels
+    # store artist-release connections
+    # store label-release connections
+
+    try:
+
+        write_rows(
+            prepare_price_data(release),
+            tbl=MARKETPLACE_TABLE)
+        write_rows(
+            prepare_release_data(release),
+            tbl=RELEASE_TABLE)
+
+    except:
+
+        pass
+
     return None
 
 
@@ -241,6 +268,7 @@ def get_release_data(**conditions):
     """
     df = read_rows(PRICES_VIEW, **conditions)
     df['country'].fillna('-', inplace=True)
+    df['lowest_price'] = df['lowest_price'].astype(float)
     return df
 
 

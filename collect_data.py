@@ -26,7 +26,7 @@ d = discogs_client.Client(
 me = d.identity()
 collection = me.collection_folders[0].releases
 wantlist = me.wantlist
-
+release1 = wantlist[69].release
 
 # -----------------------------------------------------------------------------
 # - Store collection info -----------------------------------------------------
@@ -36,7 +36,7 @@ print('Analyzing record collection')
 idx = 0
 for item in Randomize(collection):
     release = item.release
-    store_release_data(release, owned=True)
+    store_release_data(release)
     sleep_random()
     idx += 1
     if idx > MAXCALLS:
@@ -50,7 +50,7 @@ print('Analyzing record want list')
 idx = 0
 for item in Randomize(wantlist):
     release = item.release
-    store_release_data(release, owned=False)
+    store_release_data(release)
     sleep_random()
     idx += 1
     if idx > MAXCALLS:

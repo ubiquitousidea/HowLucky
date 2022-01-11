@@ -27,8 +27,11 @@ app.layout = layout_1  # page_layout
 @app.callback(
     Output('graph1', 'figure'),
     Output('graph1_custom_data', 'data'),
-    Input('entity_dropdown', 'value'))
-def update_graph1(entity):
+    Input('entity_dropdown', 'value'),
+    Input('x_measure', 'value'),
+    Input('y_measure', 'value')
+)
+def update_graph1(entity, x_measure, y_measure):
 
     if entity == 'country':
         plot_func = make_country_plot
@@ -41,7 +44,7 @@ def update_graph1(entity):
     else:
         raise PreventUpdate
 
-    return plot_func()
+    return plot_func(x_measure=x_measure, y_measure=y_measure)
 
 
 @app.callback(
