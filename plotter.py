@@ -118,7 +118,7 @@ def make_label_plot(x_measure='median', y_measure='median'):
         y_measure=y_measure
     )
     fig.update_traces(
-        hovertemplate='Label %{customdata[0]}' + xy_hovertemplate(x_measure, y_measure)
+        hovertemplate='Label %{customdata[0]}<br>' + xy_hovertemplate(x_measure, y_measure)
     )
     return fig, groupings
 

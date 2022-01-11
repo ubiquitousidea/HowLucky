@@ -64,6 +64,9 @@ def update_graph2(traces, entity, custom_data_labels):
     elif entity == 'country':
         conditions = get_factor('country', traces, custom_data_labels)
         color_var = 'country'
+    elif entity == 'label':
+        conditions = get_factor('label', traces, custom_data_labels)
+        color_var = 'label'
     else:
         conditions = {}
         color_var = 'year'

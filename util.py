@@ -249,6 +249,14 @@ def prepare_price_data(release):
     return pd.DataFrame(output, index=[0])
 
 
+def get_country(item):
+    try:
+        output = item.country
+    except:
+        output = ''
+    return output
+
+
 def prepare_release_data(release):
     """
     produce data frame of release data from Release object
@@ -259,7 +267,7 @@ def prepare_release_data(release):
         'release_id': release.id,
         'title': release.title,
         'year': release.year,
-        'country': release.country,
+        'country': get_country(release),
         'format': release.formats[0]['name']
     }
     try:
