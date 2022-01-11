@@ -1,10 +1,12 @@
 import time
 import yaml
 import psycopg2
+from psycopg2.extensions import register_adapter, AsIs
 import pandas as pd
 import discogs_client
 from yaml import Loader, Dumper
 from secrets import token_urlsafe
+import numpy as np
 from numpy import array, where
 from numpy.random import permutation, exponential
 
@@ -25,6 +27,18 @@ E_LABEL_RELEASE = 'label_release'
 
 # views
 PRICES_VIEW = 'prices'
+
+
+def addapt_numpy_float64(numpy_float64):
+    return AsIs(numpy_float64)
+
+
+def addapt_numpy_int64(numpy_int64):
+    return AsIs(numpy_int64)
+
+
+register_adapter(np.float64, addapt_numpy_float64)
+register_adapter(np.int64, addapt_numpy_int64)
 
 
 # -----------------------------------------------------------------------------
@@ -198,6 +212,22 @@ def read_rows(tbl, **conditions):
 # -----------------------------------------------------------------------------
 
 
+def get_image_url(item):
+    try:
+        output = item.images[0]['uri']
+    except:
+        output = ''
+    return output
+
+
+def get_profile(item):
+    try:
+        output = item.profile
+    except:
+        output = ''
+    return output
+
+
 def prepare_price_data(release):
     """
     prepare data frame of price data from Release object
@@ -253,8 +283,8 @@ def prepare_label_data(release):
     labels = [{
         'label_id': label.id,
         'name': label.name,
-        'profile': label.profile,
-        'image': label.images[0]['uri']
+        'profile': get_profile(label),
+        'image': get_image_url(label)
     } for label in labels]
     label_release = [{
         'release_id': rid, 'label_id': label['label_id']
@@ -272,8 +302,8 @@ def prepare_artist_data(release):
     artists = [{
         'artist_id': artist.id,
         'name': artist.name,
-        'profile': artist.profile,
-        'url': artist.images[0]['uri']
+        'profile': get_profile(artist),
+        'image': get_image_url(artist)
     } for artist in artists]
     artist_release = [{
         'artist_id': artist['artist_id'], 'release_id': rid
@@ -308,8 +338,8 @@ def store_release_data(release):
         write_rows(labels, LABEL_TABLE)
         write_rows(artist_release, E_ARTIST_RELEASE)
         write_rows(artists, ARTIST_TABLE)
-    except:
-        pass
+    except Exception as e:
+        raise e
     return None
 
 

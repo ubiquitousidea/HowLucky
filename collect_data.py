@@ -9,7 +9,7 @@ from util import load_yaml, store_release_data, Randomize, sleep_random
 import discogs_client
 
 
-MAXCALLS = 200
+MAXCALLS = 50
 
 
 app_keys = load_yaml('keys/appdata.yaml')
@@ -42,16 +42,3 @@ for item in Randomize(collection):
     if idx > MAXCALLS:
         break
 
-# -----------------------------------------------------------------------------
-# - Store want list info ------------------------------------------------------
-# -----------------------------------------------------------------------------
-
-print('Analyzing record want list')
-idx = 0
-for item in Randomize(wantlist):
-    release = item.release
-    store_release_data(release)
-    sleep_random()
-    idx += 1
-    if idx > MAXCALLS:
-        break
