@@ -42,6 +42,13 @@ def figure_style(func):
 
 
 def aggregate_prices(groupings, x_measure, y_measure):
+    """
+    Utility function to collect and aggregate the prices by the groupings specified
+    :param groupings: names of the grouping columns
+    :param x_measure: measure to apply on number for sale
+    :param y_measure: measure to apply on lowest price
+    :return: grouped data frame with price summary
+    """
     return (
         get_release_data()
         .groupby(groupings)
@@ -176,31 +183,35 @@ def make_album_plot(x_measure='median', y_measure='median'):
 @figure_style
 def make_timeseries_plot(color_var, y_var='lowest_price', **conditions):
     df = get_release_data(**conditions)
-    custom_data = ['artist', 'title', 'num_for_sale', 'lowest_price', 'year']
+    custom_data = [
+        'title', 'artist', 'num_for_sale', 'lowest_price', 'year',
+        'artist_id', 'release_id', 'label', 'label_id']
     fig = px.line(
         df,
         x='when',
         y=y_var,
         line_group='release_id',
         color=color_var,
+        markers=True,
         custom_data=custom_data,
         labels={
             'when': 'Date Time',
             'lowest_price': 'Lowest Price',
             'num_for_sale': 'Number For Sale',
-            'country': 'Country'
+            'country': 'Country',
+            'label': 'Record Label'
         },
         title="Album Prices over Time"
     )
     fig.update_traces(
         hovertemplate=(
-            '<b>Artist</b>: %{customdata[0]}<br>'
-            '<b>Album</b>: %{customdata[1]}<br>'
+            '<b>Album</b>: %{customdata[0]}<br>'
+            '<b>Artist</b>: %{customdata[1]}<br>'
+            '<b>Label</b>: %{customdata[7]}<br>'
             '<b>Year</b>: %{customdata[4]}<br>'
             'Date: %{x}<br>'
             'Lowest Price: %{customdata[3]:$.2f}<br>'
             'Number for Sale: %{customdata[2]}'
-
         )
     )
     y_max = 1.05 * df[y_var].astype(float).max()

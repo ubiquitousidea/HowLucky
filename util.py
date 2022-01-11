@@ -1,5 +1,6 @@
 import time
 import yaml
+from json import dumps
 import psycopg2
 from psycopg2.extensions import register_adapter, AsIs
 import pandas as pd
@@ -69,6 +70,15 @@ def write_yaml(data, fname):
     with open(fname, 'w') as stream:
         yaml.dump(data, stream, Dumper=Dumper)
     return None
+
+
+def dump_json(d):
+    """
+    output dictionary as a json string
+    :param d: dictionary
+    :return: string
+    """
+    return dumps(d, indent=4, sort_keys=True)
 
 
 def get_factor(attribute, traces, custom_data_labels):

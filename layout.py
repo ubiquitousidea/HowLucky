@@ -100,14 +100,16 @@ layout_1 = dbc.Container([
             dcc.Graph(
                 id='graph1',
                 style={'height': '70vh', 'width': '48vw'}),
-            dcc.Store(id='graph1_custom_data')
+            dcc.Store(id='graph1_custom_data'),
+            html.Pre(id='graph1_selection', style={'color': '#fff'})
         ]),
         dbc.Col([
             dcc.Graph(
                 id='graph2',
                 figure=Figure(layout=Layout(**LAYOUT_STYLE)),
                 style={'height': '70vh', 'width': '48vw'}),
-            dcc.Store(id='graph2_custom_data')
+            dcc.Store(id='graph2_custom_data'),
+            html.Pre(id='graph2_selection', style={'color': '#fff'}),
         ])
     ])
 ], fluid=True, id='main_container', style=MAIN_STYLE)

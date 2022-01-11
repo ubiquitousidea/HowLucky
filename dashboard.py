@@ -7,7 +7,7 @@ from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 import webbrowser
-from util import get_factor
+from util import get_factor, dump_json
 from layout import page_layout, layout_1
 from plotter import (
     make_country_plot,
@@ -73,6 +73,18 @@ def update_graph2(traces, y_var, entity, custom_data_labels):
         color_var = 'year'
 
     return make_timeseries_plot(color_var, y_var=y_var, **conditions)
+
+
+@app.callback(Output('graph1_selection', 'children'),
+              Input('graph1', 'selectedData'))
+def report_graph1_selection(selected):
+    return dump_json(selected)
+
+
+@app.callback(Output('graph2_selection', 'children'),
+              Input('graph2', 'selectedData'))
+def report_graph2_selection(selected):
+    return dump_json(selected)
 
 
 if __name__ == '__main__':
