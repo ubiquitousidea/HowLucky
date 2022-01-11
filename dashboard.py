@@ -7,15 +7,14 @@ from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 import webbrowser
-from numpy import where, array
+from util import get_factor
 from layout import page_layout, layout_1
 from plotter import (
     make_country_plot,
     make_label_plot,
     make_artist_plot,
     make_album_plot,
-    make_timeseries_plot,
-
+    make_timeseries_plot
 )
 
 
@@ -57,19 +56,13 @@ def update_graph2(traces, entity, custom_data_labels):
     if traces is None:
         raise PreventUpdate
     if entity == 'album':
-        release_index = where(array(custom_data_labels) == 'release_id')[0][0]
-        release_ids = [point['customdata'][release_index] for point in traces['points']]
-        conditions = {'release_id': release_ids}
+        conditions = get_factor('release_id', traces, custom_data_labels)
         color_var = 'title'
     elif entity == 'artist':
-        artist_index = where(array(custom_data_labels) == 'artist_id')[0][0]
-        artist_ids = [point['customdata'][artist_index] for point in traces['points']]
-        conditions = {'artist_id': artist_ids}
+        conditions = get_factor('artist_id', traces, custom_data_labels)
         color_var = 'artist'
     elif entity == 'country':
-        country_index = where(array(custom_data_labels) == 'country')[0][0]
-        country_names = [point['customdata'][country_index] for point in traces['points']]
-        conditions = {'country': country_names}
+        conditions = get_factor('country', traces, custom_data_labels)
         color_var = 'country'
     else:
         conditions = {}

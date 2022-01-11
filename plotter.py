@@ -1,6 +1,4 @@
-from numpy import log
-import pandas as pd
-
+from numpy import log, where, array
 import plotly.graph_objects as go
 import plotly.express as px
 from util import get_release_data
@@ -36,26 +34,27 @@ def figure_style(func):
     return wrapper
 
 
-def aggregate_prices(groupings, title, x_measure='median', y_measure='median', log_size=False):
-    """
-    group the price data and aggregate price and supply
-    :param groupings: list of names of categorical columns for grouping the marketplace data
-    :param title: title for the plot figure
-    :param x_measure: function to aggregate num_for_sale over groups
-    :param y_measure: function to aggregate lowest_price over groups
-    :param log_size: if False, size equals record count. if True, size equals log record count
-    :return: Figure
-    """
-    df = (
+def aggregate_prices(groupings, x_measure, y_measure):
+    return (
         get_release_data()
         .groupby(groupings)
         .agg({
             'lowest_price': y_measure,
             'num_for_sale': x_measure,
             'title': 'count'
-        }).rename(columns={'title': 'count'})
-        .assign(count=lambda x: x['count'] if log_size is False else log(x['count']))
-    )
+        }).rename(columns={'title': 'count'}))
+
+
+def agg_plot(groupings, title, x_measure='median', y_measure='median'):
+    """
+    group the price data and aggregate price and supply
+    :param groupings: list of names of categorical columns for grouping the marketplace data
+    :param title: title for the plot figure
+    :param x_measure: function to aggregate num_for_sale over groups
+    :param y_measure: function to aggregate lowest_price over groups
+    :return: Figure
+    """
+    df = aggregate_prices(groupings, x_measure, y_measure)
     fig = px.scatter(
         df.reset_index(),
         x='num_for_sale',
@@ -86,6 +85,7 @@ def xy_hovertemplate(x_measure, y_measure):
         '%{y:$.2f}'
     )
 
+
 @figure_style
 def make_country_plot(x_measure='median', y_measure='median'):
     """
@@ -93,7 +93,11 @@ def make_country_plot(x_measure='median', y_measure='median'):
     :return: Figure
     """
     groupings = ['country']
-    fig = aggregate_prices(groupings, 'Release Country')
+    fig = agg_plot(
+        groupings=groupings,
+        title='Release Country',
+        x_measure=x_measure,
+        y_measure=y_measure)
     fig.update_traces(
         hovertemplate='Country: %{customdata[0]}<br>' + xy_hovertemplate(x_measure, y_measure)
     )
@@ -107,7 +111,12 @@ def make_label_plot(x_measure='median', y_measure='median'):
     :return:
     """
     groupings = ['label', 'label_id']
-    fig = aggregate_prices(groupings, 'Record Label')
+    fig = agg_plot(
+        groupings=groupings,
+        title='Record Label',
+        x_measure=x_measure,
+        y_measure=y_measure
+    )
     fig.update_traces(
         hovertemplate='Label %{customdata[0]}' + xy_hovertemplate(x_measure, y_measure)
     )
@@ -121,7 +130,7 @@ def make_artist_plot(x_measure='median', y_measure='median'):
     :return: Figure
     """
     groupings = ['artist', 'artist_id']
-    fig = aggregate_prices(
+    fig = agg_plot(
         groupings=groupings,
         title='Artists: Price vs. Supply',
         x_measure=x_measure,
@@ -139,7 +148,7 @@ def make_album_plot(x_measure='median', y_measure='median'):
     :return: Figure
     """
     groupings = ['artist', 'title', 'release_id', 'artist_id', 'master_id']
-    fig = aggregate_prices(
+    fig = agg_plot(
         groupings=groupings,
         title='Albums: Price vs Supply',
         x_measure=x_measure,

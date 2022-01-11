@@ -5,6 +5,7 @@ import pandas as pd
 import discogs_client
 from yaml import Loader, Dumper
 from secrets import token_urlsafe
+from numpy import array, where
 from numpy.random import permutation, exponential
 
 
@@ -54,6 +55,22 @@ def write_yaml(data, fname):
     with open(fname, 'w') as stream:
         yaml.dump(data, stream, Dumper=Dumper)
     return None
+
+
+def get_factor(attribute, traces, custom_data_labels):
+    """
+    extract custom data from selected points by name
+    :param attribute: name of the variable to extract
+    :param custom_data_labels: a list of the column names represented in the points'
+        customdata attribute
+    :param traces: plotly/dash traces, selectedData attribute of a dcc.Graph for example
+    :return: list of unique values of colname among the selected points in traces
+    """
+    var_index = where(array(custom_data_labels) == attribute)[0][0]
+    values = [point['customdata'][var_index] for point in traces['points']]
+    values = list(set(values))
+    condition = {attribute: values}
+    return condition
 
 
 # -----------------------------------------------------------------------------
