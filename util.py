@@ -1,15 +1,15 @@
+import psycopg2
+import discogs_client
 import time
 import yaml
-from json import dumps
-import psycopg2
-from psycopg2.extensions import register_adapter, AsIs
 import pandas as pd
-import discogs_client
-from yaml import Loader, Dumper
-from secrets import token_urlsafe
 import numpy as np
 from numpy import array, where
 from numpy.random import permutation, exponential
+from psycopg2.extensions import register_adapter, AsIs
+from yaml import Loader, Dumper
+from json import dumps
+from secrets import token_urlsafe
 
 
 SCHEMA_NAME = 'public'
@@ -85,9 +85,8 @@ def get_factor(attribute, traces, custom_data_labels):
     """
     extract custom data from selected points by name
     :param attribute: name of the variable to extract
-    :param custom_data_labels: a list of the column names represented in the points'
-        customdata attribute
-    :param traces: plotly/dash traces, selectedData attribute of a dcc.Graph for example
+    :param custom_data_labels: list of the column names in the points' customdata
+    :param traces: selectedData attribute of a dcc.Graph
     :return: list of unique values of colname among the selected points in traces
     """
     var_index = where(array(custom_data_labels) == attribute)[0][0]
@@ -124,13 +123,15 @@ class Randomize(object):
             yield self.iterable[i]
 
 
-def sleep_random():
+def sleep_random(quiet=False):
     """
     sleep for a random time (exponential distributed)
+    :param quiet: if False, print the sleep time before sleeping
     :return: None
     """
     n = exponential(2, 1)[0]
-    print(f'sleeping {round(n, 2)} seconds')
+    if not quiet:
+        print(f'sleeping {round(n, 2)} seconds')
     time.sleep(n)
     return None
 
@@ -186,8 +187,8 @@ def make_condition_string(col_name, value):
     :return: sql string
     """
     if isinstance(value, (list, tuple)):
-        value = list(set(value))  # use only unique values
-        quoted_values = [f"'{val}'" for val in value]
+        value = list(set(value))
+        quoted_values = ['\'' + val.replace('\'', '\'\'') + '\'' for val in value]
         value_list = '(' + ','.join(quoted_values) + ')'
         _output = f"{col_name} in {value_list}"
     else:
@@ -238,6 +239,14 @@ def get_profile(item):
     return output
 
 
+def get_country(item):
+    try:
+        output = item.country
+    except:
+        output = ''
+    return output
+
+
 def prepare_price_data(release):
     """
     prepare data frame of price data from Release object
@@ -257,14 +266,6 @@ def prepare_price_data(release):
     except AttributeError:
         pass
     return pd.DataFrame(output, index=[0])
-
-
-def get_country(item):
-    try:
-        output = item.country
-    except:
-        output = ''
-    return output
 
 
 def prepare_release_data(release):
@@ -337,25 +338,27 @@ def prepare_artist_data(release):
 # -----------------------------------------------------------------------------
 
 
-def store_release_data(release):
+def store_release_data(release, store_metadata=True):
     """
     store the marketplace stats and release info for a release
     :param release: Release object
+    :param store_metadata: if False, store only the marketplace data
     :return: None
     """
     assert isinstance(release, discogs_client.Release), f'release is {type(release)}'
     print(f'Storing marketplace data for: {release.title} by {release.artists[0].name}')
     try:
         marketplace_data = prepare_price_data(release)
-        release_info = prepare_release_data(release)
-        label_release, labels = prepare_label_data(release)
-        artist_release, artists = prepare_artist_data(release)
         write_rows(marketplace_data, MARKETPLACE_TABLE)
-        write_rows(release_info, RELEASE_TABLE)
-        write_rows(label_release, E_LABEL_RELEASE)
-        write_rows(labels, LABEL_TABLE)
-        write_rows(artist_release, E_ARTIST_RELEASE)
-        write_rows(artists, ARTIST_TABLE)
+        if store_metadata:
+            release_info = prepare_release_data(release)
+            label_release, labels = prepare_label_data(release)
+            artist_release, artists = prepare_artist_data(release)
+            write_rows(release_info, RELEASE_TABLE)
+            write_rows(label_release, E_LABEL_RELEASE)
+            write_rows(labels, LABEL_TABLE)
+            write_rows(artist_release, E_ARTIST_RELEASE)
+            write_rows(artists, ARTIST_TABLE)
     except Exception as e:
         raise e
     return None
@@ -379,13 +382,3 @@ def get_releases():
     """
     return read_rows(RELEASE_TABLE)
 
-
-# -----------------------------------------------------------------------------
-# - visual things -------------------------------------------------------------
-# -----------------------------------------------------------------------------
-
-
-# class Colormaker(object):
-#     def __init__(self, image):
-#         assert isinstance(image, )
-#         self.img = image

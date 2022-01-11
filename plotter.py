@@ -185,7 +185,7 @@ def make_timeseries_plot(color_var, y_var='lowest_price', **conditions):
     df = get_release_data(**conditions)
     custom_data = [
         'title', 'artist', 'num_for_sale', 'lowest_price', 'year',
-        'artist_id', 'release_id', 'label', 'label_id']
+        'artist_id', 'release_id', 'label', 'label_id', 'country']
     fig = px.line(
         df,
         x='when',
@@ -199,7 +199,9 @@ def make_timeseries_plot(color_var, y_var='lowest_price', **conditions):
             'lowest_price': 'Lowest Price',
             'num_for_sale': 'Number For Sale',
             'country': 'Country',
-            'label': 'Record Label'
+            'label': 'Record Label',
+            'title': 'Album Title',
+            'artist': 'Artist'
         },
         title="Album Prices over Time"
     )
@@ -207,8 +209,7 @@ def make_timeseries_plot(color_var, y_var='lowest_price', **conditions):
         hovertemplate=(
             '<b>Album</b>: %{customdata[0]}<br>'
             '<b>Artist</b>: %{customdata[1]}<br>'
-            '<b>Label</b>: %{customdata[7]}<br>'
-            '<b>Year</b>: %{customdata[4]}<br>'
+            '<b>Label</b>: %{customdata[7]} (%{customdata[9]} %{customdata[4]})<br>'
             'Date: %{x}<br>'
             'Lowest Price: %{customdata[3]:$.2f}<br>'
             'Number for Sale: %{customdata[2]}'
