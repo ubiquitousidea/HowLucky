@@ -50,9 +50,10 @@ def update_graph1(entity, x_measure, y_measure):
     Output('graph2', 'figure'),
     Output('graph2_custom_data', 'data'),
     Input('graph1', 'selectedData'),
+    Input('timeseries_y_var', 'value'),
     State('entity_dropdown', 'value'),
     State('graph1_custom_data', 'data'))
-def update_graph2(traces, entity, custom_data_labels):
+def update_graph2(traces, y_var, entity, custom_data_labels):
     if traces is None:
         raise PreventUpdate
     if entity == 'album':
@@ -71,7 +72,7 @@ def update_graph2(traces, entity, custom_data_labels):
         conditions = {}
         color_var = 'year'
 
-    return make_timeseries_plot(color_var, **conditions)
+    return make_timeseries_plot(color_var, y_var=y_var, **conditions)
 
 
 if __name__ == '__main__':

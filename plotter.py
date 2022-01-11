@@ -8,8 +8,9 @@ LAYOUT_STYLE = dict(
     paper_bgcolor='rgba(0,0,0,0)',
     plot_bgcolor='rgba(0,0,0,0)',
     font_color='#CCCCCC',
-    yaxis_tickprefix='$',
-    yaxis_tickformat=',.2f',
+    font_size=18,
+    xaxis_tickfont_size=12,
+    yaxis_tickfont_size=12,
     xaxis_tickfont_color='#CCCCCC',
     yaxis_tickfont_color='#CCCCCC',
     xaxis_zeroline=False,
@@ -21,6 +22,13 @@ LAYOUT_STYLE = dict(
 )
 
 
+YAXIS_MONEY_FORMAT = dict(
+    yaxis_tickprefix='$',
+    yaxis_tickformat=',.2f',
+
+)
+
+
 def figure_style(func):
     """
     Decorator to make plot generating functions produce consistent style
@@ -29,7 +37,6 @@ def figure_style(func):
     def wrapper(*args, **kwargs):
         fig, custom_data_labels = func(*args, **kwargs)
         fig.update_layout(**LAYOUT_STYLE)
-
         return fig, custom_data_labels
     return wrapper
 
@@ -98,6 +105,7 @@ def make_country_plot(x_measure='median', y_measure='median'):
         title='Release Country',
         x_measure=x_measure,
         y_measure=y_measure)
+    fig.update_layout(**YAXIS_MONEY_FORMAT)
     fig.update_traces(
         hovertemplate='Country: %{customdata[0]}<br>' + xy_hovertemplate(x_measure, y_measure)
     )
@@ -117,6 +125,7 @@ def make_label_plot(x_measure='median', y_measure='median'):
         x_measure=x_measure,
         y_measure=y_measure
     )
+    fig.update_layout(**YAXIS_MONEY_FORMAT)
     fig.update_traces(
         hovertemplate='Label %{customdata[0]}<br>' + xy_hovertemplate(x_measure, y_measure)
     )
@@ -135,6 +144,7 @@ def make_artist_plot(x_measure='median', y_measure='median'):
         title='Artists: Price vs. Supply',
         x_measure=x_measure,
         y_measure=y_measure)
+    fig.update_layout(**YAXIS_MONEY_FORMAT)
     fig.update_traces(
         hovertemplate='Artist: %{customdata[0]}<br>' + xy_hovertemplate(x_measure, y_measure)
     )
@@ -153,6 +163,7 @@ def make_album_plot(x_measure='median', y_measure='median'):
         title='Albums: Price vs Supply',
         x_measure=x_measure,
         y_measure=y_measure)
+    fig.update_layout(**YAXIS_MONEY_FORMAT)
     fig.update_traces(
         hovertemplate=(
             '<b>Artist</b>: %{customdata[0]}<br>'
@@ -163,19 +174,20 @@ def make_album_plot(x_measure='median', y_measure='median'):
 
 
 @figure_style
-def make_timeseries_plot(color_var, **conditions):
+def make_timeseries_plot(color_var, y_var='lowest_price', **conditions):
     df = get_release_data(**conditions)
-    custom_data = ['artist', 'title', 'num_for_sale', 'year']
+    custom_data = ['artist', 'title', 'num_for_sale', 'lowest_price', 'year']
     fig = px.line(
         df,
         x='when',
-        y='lowest_price',
+        y=y_var,
         line_group='release_id',
         color=color_var,
         custom_data=custom_data,
         labels={
             'when': 'Date Time',
             'lowest_price': 'Lowest Price',
+            'num_for_sale': 'Number For Sale',
             'country': 'Country'
         },
         title="Album Prices over Time"
@@ -184,13 +196,15 @@ def make_timeseries_plot(color_var, **conditions):
         hovertemplate=(
             '<b>Artist</b>: %{customdata[0]}<br>'
             '<b>Album</b>: %{customdata[1]}<br>'
-            '<b>Year</b>: %{customdata[3]}<br>'
+            '<b>Year</b>: %{customdata[4]}<br>'
             'Date: %{x}<br>'
-            'Lowest Price: %{y:$.2f}<br>'
+            'Lowest Price: %{customdata[3]:$.2f}<br>'
             'Number for Sale: %{customdata[2]}'
 
         )
     )
-    y_max = 1.05 * df['lowest_price'].astype(float).max()
+    y_max = 1.05 * df[y_var].astype(float).max()
     fig.update_yaxes(range=[0, y_max])
+    if y_var == 'lowest_price':
+        fig.update_layout(**YAXIS_MONEY_FORMAT)
     return fig, custom_data

@@ -29,6 +29,12 @@ MEASURE_OPTIONS = [
 ]
 
 
+YAXIS_OPTIONS = [
+    {'label': 'Lowest Price', 'value': 'lowest_price'},
+    {'label': 'Number for Sale', 'value': 'num_for_sale'}
+]
+
+
 RADIO_STYLE_ARGS = dict(
     style={'margin': '2px'},
     labelStyle={'color': '#fff', 'margin': '5px'},
@@ -80,8 +86,14 @@ layout_1 = dbc.Container([
                 title='Price Measure',
                 options=MEASURE_OPTIONS,
             )
-        ], width=4),
-        dbc.Col(width=8)
+        ], width=6),
+        dbc.Col([
+            Options(
+                id='timeseries_y_var',
+                title='Y-Variable',
+                options=YAXIS_OPTIONS
+            )
+        ], width='auto')
     ]),
     dbc.Row([
         dbc.Col([
