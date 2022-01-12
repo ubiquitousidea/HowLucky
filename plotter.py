@@ -1,4 +1,3 @@
-from numpy import log, where, array
 import plotly.graph_objects as go
 import plotly.express as px
 from util import get_release_data
@@ -24,8 +23,7 @@ LAYOUT_STYLE = dict(
 
 YAXIS_MONEY_FORMAT = dict(
     yaxis_tickprefix='$',
-    yaxis_tickformat=',.2f',
-
+    yaxis_tickformat=',.2f'
 )
 
 
