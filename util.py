@@ -177,22 +177,21 @@ def write_rows(df, tbl):
     return None
 
 
-def make_condition_string(col_name, value):
+def make_condition_string(colname, n):
     """
-    construct sql condition string.
-        if single value, result is of the form: 'col=value'.
-        if list, use 'col in (values...)'
-    :param col_name: name of the column where condition applies
-    :param value: str or list of str, matching value(s)
-    :return: sql string
+    generate string of formatting text for use in SQL query
+    :param n: number of values
+        if n == 1: col = val
+        if n > 1: col in (val, ...)
+    :return:
     """
-    if isinstance(value, (list, tuple)):
-        value = list(set(value))
-        quoted_values = ['\'' + val.replace('\'', '\'\'') + '\'' for val in value]
-        value_list = '(' + ','.join(quoted_values) + ')'
-        _output = f"{col_name} in {value_list}"
+    if n == 1:
+        _output = f"%s = %s"
+    elif n > 1:
+        fmt_list = ','.join(['%s'] * n)
+        _output = f"{colname} in ({fmt_list})"
     else:
-        _output = f"{col_name} = {value}"
+        raise ValueError('n must be greater than zero')
     return _output
 
 
@@ -204,14 +203,21 @@ def read_rows(tbl, **conditions):
     :return: pandas data frame
     """
     query = f"SELECT * FROM {SCHEMA_NAME}.{tbl} \n"
+    condition_values = None
     if len(conditions) > 0:
-        cond = [make_condition_string(col_name, value) for col_name, value in conditions.items()]
-        cond = ' AND '.join(cond)
-        query += f'WHERE {cond}'
+        condition_values = []
+        condition_strings = []
+        for colname, values in conditions.items():
+            n = len(values)
+            fmt = make_condition_string(colname, n)
+            condition_strings.append(fmt)
+            condition_values.extend(values)
+        condition_string = ' AND '.join(condition_strings)
+        query += f'WHERE {condition_string}'
     query = validate_query(query)
     with psycopg2.connect(**load_yaml('keys/database.yaml')) as conn:
         cur = conn.cursor()
-        cur.execute(query)
+        cur.execute(query, condition_values)
         output = pd.DataFrame(
             cur.fetchall(),
             columns=[col[0] for col in cur.description])
