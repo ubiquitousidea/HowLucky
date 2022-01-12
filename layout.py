@@ -63,6 +63,17 @@ class Options(dbc.Container):
         ]
 
 
+class GraphPlus(dbc.Container):
+    def __init__(self, *args, **kwargs):
+        dcc.Graph.__init__(self, *args, **kwargs)
+        self.generate_components()
+
+    def generate_components(self):
+        self.children = [
+            dcc.Graph(id=self.id)
+        ]
+
+
 layout_1 = dbc.Container([
     dbc.Row([
         html.H1('Record Collection Analyzer', style={'color': '#EEEEEE'})

@@ -7,7 +7,8 @@ from dash.dependencies import Input, Output, State
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 import webbrowser
-from util import get_factor, dump_json
+from util import dump_json
+from plotter_util import get_factor
 from layout import page_layout, layout_1
 from plotter import (
     make_country_plot,

@@ -1,7 +1,7 @@
 import plotly.graph_objects as go
 import plotly.express as px
 from util import get_release_data
-
+from plotter_util import get_factor
 
 LAYOUT_STYLE = dict(
     paper_bgcolor='rgba(0,0,0,0)',
@@ -86,7 +86,7 @@ def agg_plot(groupings, title, x_measure='median', y_measure='median'):
     return fig
 
 
-def xy_hovertemplate(x_measure, y_measure):
+def gen_xy_hover_template(x_measure, y_measure):
     """
     create hover template markdown string with xmeasure and ymeasure
     """
@@ -112,7 +112,7 @@ def make_country_plot(x_measure='median', y_measure='median'):
         y_measure=y_measure)
     fig.update_layout(**YAXIS_MONEY_FORMAT)
     fig.update_traces(
-        hovertemplate='Country: %{customdata[0]}<br>' + xy_hovertemplate(x_measure, y_measure)
+        hovertemplate='Country: %{customdata[0]}<br>' + gen_xy_hover_template(x_measure, y_measure)
     )
     return fig, groupings
 
@@ -132,7 +132,7 @@ def make_label_plot(x_measure='median', y_measure='median'):
     )
     fig.update_layout(**YAXIS_MONEY_FORMAT)
     fig.update_traces(
-        hovertemplate='Label %{customdata[0]}<br>' + xy_hovertemplate(x_measure, y_measure)
+        hovertemplate='Label %{customdata[0]}<br>' + gen_xy_hover_template(x_measure, y_measure)
     )
     return fig, groupings
 
@@ -151,7 +151,7 @@ def make_artist_plot(x_measure='median', y_measure='median'):
         y_measure=y_measure)
     fig.update_layout(**YAXIS_MONEY_FORMAT)
     fig.update_traces(
-        hovertemplate='Artist: %{customdata[0]}<br>' + xy_hovertemplate(x_measure, y_measure)
+        hovertemplate='Artist: %{customdata[0]}<br>' + gen_xy_hover_template(x_measure, y_measure)
     )
     return fig, groupings
 
@@ -173,13 +173,25 @@ def make_album_plot(x_measure='median', y_measure='median'):
         hovertemplate=(
             '<b>Artist</b>: %{customdata[0]}<br>'
             '<b>Album</b>: %{customdata[1]}<br>'
-        ) + xy_hovertemplate(x_measure, y_measure)
+        ) + gen_xy_hover_template(x_measure, y_measure)
     )
     return fig, groupings
 
 
+# -----------------------------------------------------------------------------
+# - Time Series Plots ---------------------------------------------------------
+# -----------------------------------------------------------------------------
+
+
 @figure_style
 def make_timeseries_plot(color_var, y_var='lowest_price', **conditions):
+    """
+    Generate a time series plot of record values
+    :param color_var: ui uses values from ENTITY_OPTIONS: (country, label, artist, album)
+    :param y_var: 'lowest_price' or 'num_for_sale'
+    :param conditions:
+    :return:
+    """
     df = get_release_data(**conditions)
     custom_data = [
         'title', 'artist', 'num_for_sale', 'lowest_price', 'year',

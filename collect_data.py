@@ -5,7 +5,12 @@ Analyze the data
 Display the data
 """
 
-from util import load_yaml, store_release_data, Randomize, sleep_random
+from util import (
+    load_yaml,
+    store_release_data,
+    Randomize,
+    sleep_random
+)
 import discogs_client
 
 
@@ -32,11 +37,11 @@ release1 = wantlist[69].release
 print('Analyzing record collection')
 for item in Randomize(collection):
     release = item.release
-    store_release_data(release)
+    store_release_data(release, store_metadata=False)
     sleep_random()
 
 print('Analyzing wantlist')
 for item in Randomize(wantlist):
     release = item.release
-    store_release_data(release)
+    store_release_data(release, store_metadata=False)
     sleep_random()
