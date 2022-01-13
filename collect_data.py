@@ -16,7 +16,13 @@ import argparse
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--limit', help='limit the number of releases to query', type=int, default=None)
+parser.add_argument(
+    '--limit', help='limit the number of releases to query', type=int, default=None)
+parser.add_argument(
+    '--store_meta',
+    help='1 for store metadata and price, 0 for only store release prices',
+    type=int, default=0
+)
 args = parser.parse_args()
 
 
@@ -43,11 +49,11 @@ release1 = wantlist[69].release
 print('Analyzing record collection')
 for item in Randomize(collection, limit=args.limit):
     release = item.release
-    store_release_data(release, store_metadata=False)
+    store_release_data(release, store_metadata=args.store)
     sleep_random()
 
 print('Analyzing wantlist')
 for item in Randomize(wantlist, limit=args.limit):
     release = item.release
-    store_release_data(release, store_metadata=False)
+    store_release_data(release, store_metadata=args.store)
     sleep_random()

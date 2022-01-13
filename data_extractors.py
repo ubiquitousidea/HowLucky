@@ -28,9 +28,11 @@ def get_image_url(item):
 
 
 @just_try
-def get_catno_url(label):
-    assert isinstance(label, discogs_client.Label)
-    return label.data['catno']
+def get_catno(label=None, release=None):
+    if label is not None:
+        return label.data['catno']
+    elif release is not None:
+        return release.labels[0].data['catno']
 
 
 @just_try
@@ -106,7 +108,8 @@ def prepare_release_data(release):
         'title': release.title,
         'year': release.year,
         'country': get_country(release),
-        'format': release.formats[0]['name']
+        'format': release.formats[0]['name'],
+        'catno': get_catno(release)
     }
     try:
         output.update({

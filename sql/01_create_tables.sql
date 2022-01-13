@@ -52,6 +52,7 @@ CREATE TABLE IF NOT EXISTS public.releases
     country text COLLATE pg_catalog."default",
     master_id bigint,
     format text COLLATE pg_catalog."default",
+    catno character varying(32) COLLATE pg_catalog."default",
     CONSTRAINT releases_pkey PRIMARY KEY (release_id)
 )
 
@@ -59,7 +60,6 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS public.releases
     OWNER to dsnyder;
-
 
 -- Table: public.marketplace
 

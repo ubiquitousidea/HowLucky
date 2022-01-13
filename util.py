@@ -138,24 +138,6 @@ def write_rows(df, tbl, returning=None):
     return None
 
 
-# def make_condition_string(colname, n):
-#     """
-#     generate string of formatting text for use in SQL query
-#     :param n: number of values
-#         if n == 1: col = val
-#         if n > 1: col in (val, ...)
-#     :return:
-#     """
-#     if n == 1:
-#         _output = f"{colname} = %s"
-#     elif n > 1:
-#         fmt_list = ','.join(['%s'] * n)
-#         _output = f"{colname} in ({fmt_list})"
-#     else:
-#         raise ValueError('n must be greater than zero')
-#     return _output
-
-
 def read_rows(tbl, **conditions):
     """
     read data from the database table tbl where conditions are true
@@ -226,12 +208,3 @@ def get_release_data(**conditions):
     df['country'].fillna('-', inplace=True)
     df['lowest_price'] = df['lowest_price'].astype(float)
     return df
-
-
-# def get_releases():
-#     """
-#     get all releases in local database
-#     :return: pandas data frame
-#     """
-#     return read_rows(RELEASE_TABLE)
-#
