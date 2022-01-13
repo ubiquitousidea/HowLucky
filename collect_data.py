@@ -12,6 +12,12 @@ from util import (
     sleep_random
 )
 import discogs_client
+import argparse
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--limit', help='limit the number of releases to query', type=int, default=None)
+args = parser.parse_args()
 
 
 app_keys = load_yaml('keys/appdata.yaml')
@@ -35,13 +41,13 @@ release1 = wantlist[69].release
 # -----------------------------------------------------------------------------
 
 print('Analyzing record collection')
-for item in Randomize(collection):
+for item in Randomize(collection, limit=args.limit):
     release = item.release
     store_release_data(release, store_metadata=False)
     sleep_random()
 
 print('Analyzing wantlist')
-for item in Randomize(wantlist):
+for item in Randomize(wantlist, limit=args.limit):
     release = item.release
     store_release_data(release, store_metadata=False)
     sleep_random()

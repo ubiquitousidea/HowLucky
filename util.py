@@ -70,12 +70,17 @@ class Randomize(object):
     """
     a class for iterating in a random order
     """
-    def __init__(self, iterable):
+    def __init__(self, iterable, limit=None):
         self.iterable = iterable
-        self.n = len(self.iterable)
+        self._n = len(self.iterable)
+        self._limit = limit
 
     def __iter__(self):
-        for i in permutation(self.n):
+        j = 0
+        for i in permutation(self._n):
+            j += 1
+            if self._limit is not None and j > self._limit:
+                raise StopIteration
             yield self.iterable[i]
 
 
@@ -120,12 +125,9 @@ def write_rows(df, tbl, returning=None):
     with psycopg2.connect(**load_yaml('keys/database.yaml')) as conn:
         cur = conn.cursor()
         for idx, row in df.iterrows():
-            query = (
-                f"INSERT INTO {SCHEMA_NAME}.{tbl}({col_names})\n"
-                f"VALUES ({fmt})\n"
-                f"ON CONFLICT DO NOTHING"
-                f"RETURNING {returning}" if returning is not None else None
-            )
+            query = f"INSERT INTO {SCHEMA_NAME}.{tbl}({col_names})\nVALUES ({fmt})\n"
+            query += f'RETURNING {returning}' if returning is not None else ''
+            query += f"ON CONFLICT DO NOTHING"
             query = punctuate_query(query)
             try:
                 cur.execute(query, row.values)

@@ -17,7 +17,7 @@ def just_try(func):
         try:
             return func(*args, **kwargs)
         except:
-            return ''
+            return None
     return wrapper
 
 
@@ -59,6 +59,21 @@ def get_country(item):
     return item.country
 
 
+@just_try
+def get_lowest_price(stats):
+    return stats.lowest_price.value
+
+
+@just_try
+def get_lowest_price_currency(stats):
+    return stats.lowest_price.currency
+
+
+@just_try
+def get_num_for_sale(stats):
+    return stats.num_for_sale
+
+
 def prepare_price_data(release):
     """
     prepare data frame of price data from Release object
@@ -70,12 +85,10 @@ def prepare_price_data(release):
         'release_id': release.id
     }
     try:
-        # pythonic instruments intended to increase readability
-        # can be misused to create ugly code.
         output.update({
-            'lowest_price': just_try(lambda x: x.lowest_price.value)(stats),
-            'currency': just_try(lambda x: x.lowest_price.currency)(stats),
-            'num_for_sale': just_try(lambda x: x.num_for_sale)(stats)
+            'lowest_price': get_lowest_price(stats),
+            'currency': get_lowest_price_currency(stats),
+            'num_for_sale': get_num_for_sale(stats)
         })
     except AttributeError:
         pass
