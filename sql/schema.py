@@ -1,3 +1,5 @@
+from util import load_yaml
+
 SCHEMA_NAME = 'public'
 
 # historial price data table
@@ -14,3 +16,6 @@ E_LABEL_RELEASE = 'label_release'
 
 # views
 PRICES_VIEW = 'prices'
+
+
+DATABASE_KEYS = load_yaml('keys/database.yaml')

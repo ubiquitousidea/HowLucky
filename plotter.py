@@ -1,7 +1,6 @@
-import plotly.graph_objects as go
 import plotly.express as px
-from util import get_release_data
-from plotter_util import get_factor
+from database_util import get_price_data
+
 
 LAYOUT_STYLE = dict(
     paper_bgcolor='rgba(0,0,0,0)',
@@ -48,7 +47,7 @@ def aggregate_prices(groupings, x_measure, y_measure):
     :return: grouped data frame with price summary
     """
     return (
-        get_release_data()
+        get_price_data()
         .groupby(groupings)
         .agg({
             'lowest_price': y_measure,
@@ -192,7 +191,7 @@ def make_timeseries_plot(color_var, y_var='lowest_price', **conditions):
     :param conditions:
     :return:
     """
-    df = get_release_data(**conditions)
+    df = get_price_data(**conditions)
     custom_data = [
         'title', 'artist', 'num_for_sale', 'lowest_price', 'year',
         'artist_id', 'release_id', 'label', 'label_id', 'country']

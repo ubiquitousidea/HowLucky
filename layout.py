@@ -13,6 +13,14 @@ ENTITY_OPTIONS = [
 ]
 
 
+ENTITY_MAP = dict(
+    album=['release_id', 'title'],
+    artist=['artist_id', 'artist'],
+    country=['country', 'country'],
+    label=['label', 'label']
+)
+
+
 MAIN_STYLE = {
     'font-family': 'helvetica',
     'background-color': '#222222',
@@ -40,6 +48,8 @@ RADIO_STYLE_ARGS = dict(
     labelStyle={'color': '#fff', 'margin': '5px'},
     inputStyle={'margin': '5px'}
 )
+
+
 
 
 class Options(dbc.Container):
@@ -85,6 +95,30 @@ class GraphPlus(dbc.Container):
         ]
 
 
+class BaseCard(dbc.Card):
+    def __init__(self, row):
+        entity, _ = row.index[0].split('_')
+        _id = row.values[0]
+        dbc.Card.__init__(self, id=f'{entity}_{_id}_card', style={'width': '18rem'})
+        self._title = row['name']
+        self._image_url = row['image']
+        self._profile = row['profile']
+        self.generate_components()
+
+    def generate_components(self):
+        self.children = [
+            dbc.CardImg(
+                src=self._image_url,
+                top=True,
+                style={"opacity": 0.5}
+            ),
+            dbc.CardImgOverlay([
+                html.H4(self._title, style={'color': '#fff'}),
+                html.P(self._profile, style={'color': '#fff'})
+            ])
+        ]
+
+
 layout_1 = dbc.Container([
     dbc.Row([
         html.H1('Record Collection Analyzer', style={'color': '#EEEEEE'})
@@ -122,10 +156,9 @@ layout_1 = dbc.Container([
             GraphPlus(id='graph1')
         ]),
         dbc.Col([
-            GraphPlus(id='graph2')
+            dbc.Collapse(GraphPlus(id='graph2'), id='graph2_collapse', is_open=True),
+            dbc.Collapse(id='card_container', is_open=True)
+
         ])
     ])
 ], fluid=True, id='main_container', style=MAIN_STYLE)
-
-
-page_layout = dbc.Container()

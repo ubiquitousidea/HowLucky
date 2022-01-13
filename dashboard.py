@@ -9,7 +9,8 @@ import dash_bootstrap_components as dbc
 import webbrowser
 from util import dump_json
 from plotter_util import get_factor
-from layout import page_layout, layout_1
+from database_util import get_metadata
+from layout import layout_1, BaseCard, ENTITY_MAP
 from plotter import (
     make_country_plot,
     make_label_plot,
@@ -47,6 +48,28 @@ def update_graph1(entity, x_measure, y_measure):
     return plot_func(x_measure=x_measure, y_measure=y_measure)
 
 
+@app.callback(Output('card_container', 'children'),
+              Input('graph1', 'selectedData'),
+              State('entity_dropdown', 'value'),
+              State('graph1_custom_data', 'data'))
+def add_cards(traces, entity, custom_data_labels):
+    """
+    generate dash bootstrap cards to represent a selection of point
+    :param traces: selected points
+    :param entity: what entity those points represent (country, label, artist, release)
+    :param custom_data_labels: list of col names stored in each points' customdata
+    :return: list of Cards
+    """
+    col_name, color_var = ENTITY_MAP.get(entity)
+    conditions = get_factor(col_name, traces, custom_data_labels)
+    card_data = get_metadata(entity, **conditions)
+    cards = []
+    for idx, row in card_data.iterrows():
+        card = BaseCard(row)
+        cards.append(card)
+    return cards
+
+
 @app.callback(
     Output('graph2', 'figure'),
     Output('graph2_custom_data', 'data'),
@@ -57,22 +80,8 @@ def update_graph1(entity, x_measure, y_measure):
 def update_graph2(traces, y_var, entity, custom_data_labels):
     if traces is None:
         raise PreventUpdate
-    if entity == 'album':
-        conditions = get_factor('release_id', traces, custom_data_labels)
-        color_var = 'title'
-    elif entity == 'artist':
-        conditions = get_factor('artist_id', traces, custom_data_labels)
-        color_var = 'artist'
-    elif entity == 'country':
-        conditions = get_factor('country', traces, custom_data_labels)
-        color_var = 'country'
-    elif entity == 'label':
-        conditions = get_factor('label', traces, custom_data_labels)
-        color_var = 'label'
-    else:
-        conditions = {}
-        color_var = 'year'
-
+    col_name, color_var = ENTITY_MAP.get(entity)
+    conditions = get_factor(col_name, traces, custom_data_labels)
     return make_timeseries_plot(color_var, y_var=y_var, **conditions)
 
 
