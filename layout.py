@@ -78,8 +78,9 @@ class GraphPlus(dbc.Container):
     Class to unify a graph and its associated customdata columns
     and a window to show selected data
     """
-    def __init__(self, id, *args, **kwargs):
+    def __init__(self, id, show_selection=False, *args, **kwargs):
         self.base_id = id
+        self._show_selection = show_selection
         dbc.Container.__init__(self, id=f'{self.base_id}_container', *args, **kwargs)
         self.generate_components()
 
@@ -90,9 +91,10 @@ class GraphPlus(dbc.Container):
                 style={'height': '70vh', 'width': '45vw'},
                 figure=Figure(layout=Layout(**LAYOUT_STYLE))
             ),
-            dcc.Store(id=f'{self.base_id}_custom_data'),
-            html.Pre(id=f'{self.base_id}_selection', style={'color': '#fff'})
+            dcc.Store(id=f'{self.base_id}_custom_data')
         ]
+        if self._show_selection:
+            self.children.append(html.Pre(id=f'{self.base_id}_selection', style={'color': '#fff'}))
 
 
 class BaseCard(dbc.Card):
