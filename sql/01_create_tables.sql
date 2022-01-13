@@ -92,6 +92,7 @@ CREATE TABLE IF NOT EXISTS public.labels
     name text COLLATE pg_catalog."default" NOT NULL,
     profile text COLLATE pg_catalog."default",
     image text COLLATE pg_catalog."default",
+    thumb text COLLATE pg_catalog."default",
     CONSTRAINT labels_pkey PRIMARY KEY (label_id)
 )
 
@@ -102,8 +103,6 @@ ALTER TABLE IF EXISTS public.labels
 
 COMMENT ON TABLE public.labels
     IS 'table for storing label information';
-
-
 -- Table: public.label_release
 
 -- DROP TABLE IF EXISTS public.label_release;

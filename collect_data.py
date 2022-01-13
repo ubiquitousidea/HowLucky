@@ -49,11 +49,11 @@ release1 = wantlist[69].release
 print('Analyzing record collection')
 for item in Randomize(collection, limit=args.limit):
     release = item.release
-    store_release_data(release, store_metadata=args.store)
+    store_release_data(release, store_metadata=args.store_meta)
     sleep_random()
 
 print('Analyzing wantlist')
 for item in Randomize(wantlist, limit=args.limit):
     release = item.release
-    store_release_data(release, store_metadata=args.store)
+    store_release_data(release, store_metadata=args.store_meta)
     sleep_random()
