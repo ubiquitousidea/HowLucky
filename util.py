@@ -162,22 +162,22 @@ def read_rows(tbl, **conditions):
     :return: pandas data frame
     """
     query = f"SELECT * FROM {SCHEMA_NAME}.{tbl} \n"
-    values = None  # this name needs to be defined for cur.execute to run
+    cond_values = None  # this name needs to be defined for cur.execute to run
     if len(conditions) > 0:
-        values = []
+        cond_values = []
         format_st = []
         for colname, values in conditions.items():
             n = len(values)
             _ = ','.join(['%s'] * n)
             fmt = f'{colname} in ({_})'
             format_st.append(fmt)
-            values.extend(values)
+            cond_values.extend(values)
         condition_string = ' AND '.join(format_st)
         query += f'WHERE {condition_string}'
     query = punctuate_query(query)
     with psycopg2.connect(**load_yaml('keys/database.yaml')) as conn:
         cur = conn.cursor()
-        cur.execute(query, values)
+        cur.execute(query, cond_values)
         output = pd.DataFrame(
             cur.fetchall(),
             columns=[col[0] for col in cur.description])
