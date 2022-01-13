@@ -64,13 +64,24 @@ class Options(dbc.Container):
 
 
 class GraphPlus(dbc.Container):
-    def __init__(self, *args, **kwargs):
-        dcc.Graph.__init__(self, *args, **kwargs)
+    """
+    Class to unify a graph and its associated customdata columns
+    and a window to show selected data
+    """
+    def __init__(self, id, *args, **kwargs):
+        self.base_id = id
+        dbc.Container.__init__(self, id=f'{self.base_id}_container', *args, **kwargs)
         self.generate_components()
 
     def generate_components(self):
         self.children = [
-            dcc.Graph(id=self.id)
+            dcc.Graph(
+                id=self.base_id,
+                style={'height': '70vh', 'width': '45vw'},
+                figure=Figure(layout=Layout(**LAYOUT_STYLE))
+            ),
+            dcc.Store(id=f'{self.base_id}_custom_data'),
+            html.Pre(id=f'{self.base_id}_selection', style={'color': '#fff'})
         ]
 
 
@@ -108,19 +119,10 @@ layout_1 = dbc.Container([
     ]),
     dbc.Row([
         dbc.Col([
-            dcc.Graph(
-                id='graph1',
-                style={'height': '70vh', 'width': '48vw'}),
-            dcc.Store(id='graph1_custom_data'),
-            html.Pre(id='graph1_selection', style={'color': '#fff'})
+            GraphPlus(id='graph1')
         ]),
         dbc.Col([
-            dcc.Graph(
-                id='graph2',
-                figure=Figure(layout=Layout(**LAYOUT_STYLE)),
-                style={'height': '70vh', 'width': '48vw'}),
-            dcc.Store(id='graph2_custom_data'),
-            html.Pre(id='graph2_selection', style={'color': '#fff'}),
+            GraphPlus(id='graph2')
         ])
     ])
 ], fluid=True, id='main_container', style=MAIN_STYLE)

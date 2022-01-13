@@ -6,54 +6,45 @@ Display the data
 """
 
 from util import (
-    load_yaml,
     store_release_data,
     Randomize,
     sleep_random
 )
-import discogs_client
+from discogs_identity import collection, wantlist
 import argparse
 
+# -----------------------------------------------------------------------------
+# - Argument parsing ----------------------------------------------------------
+# -----------------------------------------------------------------------------
 
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    '--limit', help='limit the number of releases to query', type=int, default=None)
+    '--limit',
+    help='limit the number of releases to query',
+    type=int, default=None
+)
 parser.add_argument(
     '--store_meta',
-    help='1 for store metadata and price, 0 for only store release prices',
+    help='if 1, store metadata, else dont',
     type=int, default=0
 )
-args = parser.parse_args()
-
-
-app_keys = load_yaml('keys/appdata.yaml')
-token_info = load_yaml('keys/my_token.yaml')
-
-d = discogs_client.Client(
-    user_agent='HowLucky',
-    consumer_key=app_keys['Consumer Key'],
-    consumer_secret=app_keys['Consumer Secret'],
-    token=token_info['token'],
-    secret=token_info['secret']
+parser.add_argument(
+    '--store_prices',
+    help='if 1, store prices, else dont',
+    type=int, default=1
 )
-
-me = d.identity()
-collection = me.collection_folders[0].releases
-wantlist = me.wantlist
-release1 = wantlist[69].release
+args = parser.parse_args()
 
 # -----------------------------------------------------------------------------
 # - Store collection info -----------------------------------------------------
 # -----------------------------------------------------------------------------
 
-print('Analyzing record collection')
-for item in Randomize(collection, limit=args.limit):
-    release = item.release
-    store_release_data(release, store_metadata=args.store_meta)
-    sleep_random()
-
-print('Analyzing wantlist')
-for item in Randomize(wantlist, limit=args.limit):
-    release = item.release
-    store_release_data(release, store_metadata=args.store_meta)
-    sleep_random()
+for clx in (collection, wantlist):
+    for item in Randomize(clx, limit=args.limit):
+        release = item.release
+        store_release_data(
+            release,
+            store_metadata=args.store_meta,
+            store_prices=args.store_prices
+        )
+        sleep_random()

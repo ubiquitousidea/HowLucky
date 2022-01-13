@@ -16,33 +16,23 @@ def just_try(func):
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
-        except:
+        except Exception as e:
             return None
     return wrapper
 
 
 @just_try
 def get_image_url(item):
-    assert isinstance(item, discogs_client.Release)
     return item.images[0]['uri']
 
 
 @just_try
-def get_catno(label=None, release=None):
-    if label is not None:
-        return label.data['catno']
-    elif release is not None:
-        return release.labels[0].data['catno']
+def get_catno(release):
+    return release.labels[0].data['catno']
 
 
 @just_try
 def get_thumb_url(item):
-    assert isinstance(item, (
-        discogs_client.Label,
-        discogs_client.Artist,
-        discogs_client.Release,
-        discogs_client.Master
-    ))
     return item.thumb
 
 
@@ -56,9 +46,8 @@ def get_profile(item):
 
 
 @just_try
-def get_country(item):
-    assert isinstance(item, discogs_client.Release)
-    return item.country
+def get_country(release):
+    return release.country
 
 
 @just_try
@@ -127,15 +116,13 @@ def prepare_label_data(release):
     :return: dict of release_id/label_id pairs, dict of labels
     """
     rid = release.id
-    labels = release.labels
-    n_labels = len(labels)
+    n_labels = len(release.labels)
     labels = [{
         'label_id': label.id,
         'name': label.name,
         'profile': get_profile(label),
-        'image': get_image_url(label),
-        'thumb': get_thumb_url(label)
-    } for label in labels]
+        'image': get_image_url(label)
+    } for label in release.labels]
     label_release = [{
         'release_id': rid, 'label_id': label['label_id']
     } for label in labels]
@@ -162,4 +149,3 @@ def prepare_artist_data(release):
         pd.DataFrame(artist_release, index=range(n_artists)),
         pd.DataFrame(artists, index=range(n_artists))
     )
-
