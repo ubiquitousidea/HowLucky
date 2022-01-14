@@ -80,6 +80,7 @@ class GraphPlus(dbc.Container):
         self.base_id = id
         self._show_selection = show_selection
         dbc.Container.__init__(self, id=f'{self.base_id}_container', *args, **kwargs)
+        self.children = []
         self.generate_components()
 
     def generate_components(self):
@@ -95,6 +96,15 @@ class GraphPlus(dbc.Container):
             self.children.append(html.Pre(id=f'{self.base_id}_selection', style={'color': '#fff'}))
 
 
+CARD_STYLE = {
+    'width': '45vw',
+    'max-height': 500,
+    'padding': '10px',
+    'margin': '10px',
+    'background-color': '#444455'
+}
+
+
 class BaseCard(dbc.Card):
     """
     Class for artist/label/album cards
@@ -102,7 +112,8 @@ class BaseCard(dbc.Card):
     def __init__(self, row):
         entity, _ = row.index[0].split('_')
         _id = row.values[0]
-        dbc.Card.__init__(self, id=f'{entity}_{_id}_card', style={'width': '18rem'})
+        dbc.Card.__init__(self, id=f'{entity}_{_id}_card', style=CARD_STYLE, className='p-3')
+        self.children = []
         if entity == 'release':
             title = row['title']
         else:
@@ -114,15 +125,19 @@ class BaseCard(dbc.Card):
 
     def generate_components(self):
         self.children = [
-            dbc.CardImg(
-                src=self._image_url,
-                top=True,
-                style={"opacity": 0.5}
-            ),
-            dbc.CardImgOverlay([
-                html.H4(self._title, style={'color': '#fff'}),
-                html.P(self._profile, style={'color': '#fff'})
-            ])
+            dbc.Row([
+                dbc.Col([
+                    dbc.CardImg(src=self._image_url),
+                    dbc.CardImgOverlay(
+                        html.H4(
+                            self._title,
+                            style={'color': '#fff', 'margin': '1rem'})
+                    )
+                ], width=4),
+                dbc.Col([
+                    html.P(self._profile, style={'color': '#fff'})
+                ], width=8)
+            ]),
         ]
 
 
@@ -158,7 +173,7 @@ layout_1 = dbc.Container([
             GraphPlus(id='graph1')
         ]),
         dbc.Col([
-            dbc.Collapse(GraphPlus(id='graph2'), id='graph2_collapse', is_open=True),
+            dbc.Collapse(GraphPlus(id='graph2'), id='graph2_collapse', is_open=False),
             dbc.Container(id='card_container', fluid=True)
 
         ])

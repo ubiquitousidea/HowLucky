@@ -52,7 +52,7 @@ def aggregate_prices(groupings, x_measure, y_measure):
         .agg({
             'lowest_price': y_measure,
             'num_for_sale': x_measure,
-            'title': 'count'
+            'title': lambda x: x.nunique()
         }).rename(columns={'title': 'count'}))
 
 
@@ -78,7 +78,7 @@ def agg_plot(groupings, title, x_measure='median', y_measure='median'):
         labels={
             'num_for_sale': 'Number for Sale',
             'lowest_price': 'Lowest Price',
-            'count': 'Record Count'
+            'count': 'Unique Titles'
         },
         title=title
     )
