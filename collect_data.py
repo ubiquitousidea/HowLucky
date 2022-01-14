@@ -5,11 +5,8 @@ Analyze the data
 Display the data
 """
 
-from util import (
-    store_release_data,
-    Randomize,
-    sleep_random
-)
+from util import Randomize, sleep_random
+from database_util import store_release_data
 from discogs_identity import collection, wantlist
 import argparse
 

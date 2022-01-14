@@ -60,6 +60,8 @@ def add_cards(traces, entity, custom_data_labels):
     :param custom_data_labels: list of col names stored in each points' customdata
     :return: list of Cards
     """
+    if not custom_data_labels or not traces:
+        raise PreventUpdate
     col_name, color_var = ENTITY_MAP.get(entity)
     conditions = get_factor(col_name, traces, custom_data_labels)
     card_data = get_metadata(entity, **conditions)

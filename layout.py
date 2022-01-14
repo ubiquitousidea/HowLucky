@@ -17,7 +17,7 @@ ENTITY_MAP = dict(
     album=['release_id', 'title'],
     artist=['artist_id', 'artist'],
     country=['country', 'country'],
-    label=['label', 'label']
+    label=['label_id', 'label']
 )
 
 
@@ -48,8 +48,6 @@ RADIO_STYLE_ARGS = dict(
     labelStyle={'color': '#fff', 'margin': '5px'},
     inputStyle={'margin': '5px'}
 )
-
-
 
 
 class Options(dbc.Container):
@@ -98,11 +96,18 @@ class GraphPlus(dbc.Container):
 
 
 class BaseCard(dbc.Card):
+    """
+    Class for artist/label/album cards
+    """
     def __init__(self, row):
         entity, _ = row.index[0].split('_')
         _id = row.values[0]
         dbc.Card.__init__(self, id=f'{entity}_{_id}_card', style={'width': '18rem'})
-        self._title = row['name']
+        if entity == 'release':
+            title = row['title']
+        else:
+            title = row['name']
+        self._title = title
         self._image_url = row['image']
         self._profile = row['profile']
         self.generate_components()
@@ -123,32 +128,27 @@ class BaseCard(dbc.Card):
 
 layout_1 = dbc.Container([
     dbc.Row([
-        html.H1('Record Collection Analyzer', style={'color': '#EEEEEE'})
+        html.H1('Record Collection Analyzer', style={'color': '#EEEEEE', 'margin': '10px'})
     ]),
     dbc.Row([
         dbc.Col([
             Options(
-                id='entity_dropdown',
-                title='Entity',
-                options=ENTITY_OPTIONS,
-                default_option=2
+                id='entity_dropdown', title='Entity',
+                options=ENTITY_OPTIONS, default_option=2
             ),
             Options(
-                id='x_measure',
-                title='Count Measure',
+                id='x_measure', title='Count Measure',
                 options=MEASURE_OPTIONS,
 
             ),
             Options(
-                id='y_measure',
-                title='Price Measure',
+                id='y_measure', title='Price Measure',
                 options=MEASURE_OPTIONS,
             )
         ], width=6),
         dbc.Col([
             Options(
-                id='timeseries_y_var',
-                title='Y-Variable',
+                id='timeseries_y_var', title='Y-Variable',
                 options=YAXIS_OPTIONS
             )
         ], width='auto')
@@ -159,7 +159,7 @@ layout_1 = dbc.Container([
         ]),
         dbc.Col([
             dbc.Collapse(GraphPlus(id='graph2'), id='graph2_collapse', is_open=True),
-            dbc.Collapse(id='card_container', is_open=True)
+            dbc.Container(id='card_container', fluid=True)
 
         ])
     ])
