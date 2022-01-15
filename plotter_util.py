@@ -14,3 +14,12 @@ def get_factor(attribute, traces, custom_data_labels):
     values = list(set(values))
     condition = {attribute: values}
     return condition
+
+
+def get_buttons_clicked(entities, clicks):
+    """
+    return a field name : value condition dictionary from card info and card button clicks
+    :param entities: info stored in card store data attributes (could be artist ids, label ids)
+    :param clicks: number of time each button was pressed
+    :return: condition dictionary
+    """

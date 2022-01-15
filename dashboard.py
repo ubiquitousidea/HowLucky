@@ -3,7 +3,7 @@ create a dashboard to view and analyze the collected data
 """
 
 import dash
-from dash.dependencies import Input, Output, State
+from dash.dependencies import Input, Output, State, ALL
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 import webbrowser
@@ -60,8 +60,10 @@ def add_cards(traces, entity, custom_data_labels):
     :param custom_data_labels: list of col names stored in each points' customdata
     :return: list of Cards
     """
-    if not custom_data_labels or not traces:
+    if not custom_data_labels:
         raise PreventUpdate
+    if traces is None or len(traces) == 0:
+        return []
     col_name, color_var = ENTITY_MAP.get(entity)
     conditions = get_factor(col_name, traces, custom_data_labels)
     card_data = get_metadata(entity, **conditions)
@@ -72,34 +74,21 @@ def add_cards(traces, entity, custom_data_labels):
     return cards
 
 
-@app.callback(
-    Output('graph2', 'figure'),
-    Output('graph2_custom_data', 'data'),
-    Input('graph1', 'selectedData'),
-    Input('timeseries_y_var', 'value'),
-    State('entity_dropdown', 'value'),
-    State('graph1_custom_data', 'data'))
-def update_graph2(traces, y_var, entity, custom_data_labels):
-    if traces is None:
-        raise PreventUpdate
-    col_name, color_var = ENTITY_MAP.get(entity)
-    conditions = get_factor(col_name, traces, custom_data_labels)
-    return make_timeseries_plot(color_var, y_var=y_var, **conditions)
+# @app.callback(Output('graph1_selection', 'children'),
+#               Input('graph1', 'selectedData'))
+# def report_graph1_selection(selected):
+#     return dump_json(selected)
 
 
-@app.callback(Output('graph1_selection', 'children'),
-              Input('graph1', 'selectedData'))
-def report_graph1_selection(selected):
-    return dump_json(selected)
+@app.callback(Output('textplace', 'children'),
+              Input({'object': 'card_button', 'field': ALL, 'value': ALL}, 'n_clicks'),
+              State({'object': 'card_store', 'field': ALL, 'value': ALL}, 'data'))
+def get_button_clicks(n, d):
 
-
-@app.callback(Output('graph2_selection', 'children'),
-              Input('graph2', 'selectedData'))
-def report_graph2_selection(selected):
-    return dump_json(selected)
+    return dump_json({'n': n, 'd': d})
 
 
 if __name__ == '__main__':
-    port = 8052
+    port = 8058
     webbrowser.open(f'http://127.0.0.1:{port}')
     app.run_server(port=port, debug=False)
