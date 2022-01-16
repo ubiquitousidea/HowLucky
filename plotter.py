@@ -38,16 +38,17 @@ def figure_style(func):
     return wrapper
 
 
-def aggregate_prices(groupings, x_measure, y_measure):
+def aggregate_prices(groupings, x_measure, y_measure, **conditions):
     """
     Utility function to collect and aggregate the prices by the groupings specified
     :param groupings: names of the grouping columns
     :param x_measure: measure to apply on number for sale
     :param y_measure: measure to apply on lowest price
+    :param conditions:
     :return: grouped data frame with price summary
     """
     return (
-        get_price_data()
+        get_price_data(**conditions)
         .groupby(groupings)
         .agg({
             'lowest_price': y_measure,
@@ -56,7 +57,7 @@ def aggregate_prices(groupings, x_measure, y_measure):
         }).rename(columns={'title': 'count'}))
 
 
-def agg_plot(groupings, title, x_measure='median', y_measure='median'):
+def agg_plot(groupings, title, x_measure='median', y_measure='median', **conditions):
     """
     group the price data and aggregate price and supply
     :param groupings: list of names of categorical columns for grouping the marketplace data
@@ -65,7 +66,7 @@ def agg_plot(groupings, title, x_measure='median', y_measure='median'):
     :param y_measure: function to aggregate lowest_price over groups
     :return: Figure
     """
-    df = aggregate_prices(groupings, x_measure, y_measure)
+    df = aggregate_prices(groupings, x_measure, y_measure, **conditions)
     fig = px.scatter(
         df.reset_index(),
         x='num_for_sale',
@@ -156,7 +157,7 @@ def make_artist_plot(x_measure='median', y_measure='median'):
 
 
 @figure_style
-def make_album_plot(x_measure='median', y_measure='median'):
+def make_album_plot(x_measure='median', y_measure='median', **conditions):
     """
     produce a plot representing each album in the data
     :return: Figure
@@ -166,7 +167,9 @@ def make_album_plot(x_measure='median', y_measure='median'):
         groupings=groupings,
         title='Albums: Price vs Supply',
         x_measure=x_measure,
-        y_measure=y_measure)
+        y_measure=y_measure,
+        **conditions
+    )
     fig.update_layout(**YAXIS_MONEY_FORMAT)
     fig.update_traces(
         hovertemplate=(

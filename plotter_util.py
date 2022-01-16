@@ -1,4 +1,5 @@
 from numpy import where, array
+import pandas as pd
 
 
 def get_factor(attribute, traces, custom_data_labels):
@@ -23,3 +24,15 @@ def get_buttons_clicked(entities, clicks):
     :param clicks: number of time each button was pressed
     :return: condition dictionary
     """
+
+    output = pd.DataFrame(entities).assign(clicks=clicks)
+    output = output[output['clicks'].notna()]
+    output = output.assign(keep=lambda x: x.clicks % 2 == 1)
+    output = output[output['keep']]
+    try:
+        output = output.groupby('field').agg({'value': lambda x: list(x)}).reset_index().to_dict('records')
+        output = {item['field']: item['value'] for item in output}
+    except KeyError:
+        output = {}
+
+    return output

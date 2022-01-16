@@ -8,7 +8,7 @@ from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 import webbrowser
 from util import dump_json
-from plotter_util import get_factor
+from plotter_util import get_factor, get_buttons_clicked
 from database_util import get_metadata
 from layout import layout_1, BaseCard, ENTITY_MAP
 from plotter import (
@@ -28,40 +28,36 @@ app.layout = layout_1  # page_layout
 @app.callback(
     Output('graph1', 'figure'),
     Output('graph1_custom_data', 'data'),
-    Input('entity_dropdown', 'value'),
-    Input('x_measure', 'value'),
-    Input('y_measure', 'value')
-)
-def update_graph1(entity, x_measure, y_measure):
-
-    if entity == 'country':
-        plot_func = make_country_plot
-    elif entity == 'label':
-        plot_func = make_label_plot
-    elif entity == 'artist':
-        plot_func = make_artist_plot
-    elif entity == 'album':
-        plot_func = make_album_plot
-    else:
+    Input('analyze_button', 'n_clicks'))
+def update_graph1(n):
+    if not n:
         raise PreventUpdate
+    return make_artist_plot()
 
-    return plot_func(x_measure=x_measure, y_measure=y_measure)
+
+@app.callback(Output('graph2', 'figure'),
+              Output('graph2_custom_data', 'data'),
+              Input({'object': 'card_button', 'field': ALL, 'value': ALL}, 'n_clicks'),
+              State({'object': 'card_store', 'field': ALL, 'value': ALL}, 'data'))
+def update_graph2(card_clicks, card_data):
+    conditions = get_buttons_clicked(card_data, card_clicks)
+    if not conditions:
+        raise PreventUpdate
+    return make_timeseries_plot(color_var='title', **conditions)
+
 
 
 @app.callback(Output('card_container', 'children'),
               Input('graph1', 'selectedData'),
-              State('entity_dropdown', 'value'),
               State('graph1_custom_data', 'data'))
-def add_cards(traces, entity, custom_data_labels):
+def add_cards(traces, custom_data_labels):
     """
     generate dash bootstrap cards to represent a selection of point
     :param traces: selected points
-    :param entity: what entity those points represent (country, label, artist, release)
     :param custom_data_labels: list of col names stored in each points' customdata
     :return: list of Cards
     """
-    if not custom_data_labels:
-        raise PreventUpdate
+    entity = 'artist'
     if traces is None or len(traces) == 0:
         return []
     col_name, color_var = ENTITY_MAP.get(entity)
@@ -72,20 +68,6 @@ def add_cards(traces, entity, custom_data_labels):
         card = BaseCard(row)
         cards.append(card)
     return cards
-
-
-# @app.callback(Output('graph1_selection', 'children'),
-#               Input('graph1', 'selectedData'))
-# def report_graph1_selection(selected):
-#     return dump_json(selected)
-
-
-@app.callback(Output('textplace', 'children'),
-              Input({'object': 'card_button', 'field': ALL, 'value': ALL}, 'n_clicks'),
-              State({'object': 'card_store', 'field': ALL, 'value': ALL}, 'data'))
-def get_button_clicks(n, d):
-
-    return dump_json({'n': n, 'd': d})
 
 
 if __name__ == '__main__':

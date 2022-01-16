@@ -44,6 +44,12 @@ MEASURE_OPTIONS = [
 ]
 
 
+GRAPH_TYPES = [
+    {'label': 'Time Series', 'value': 'timeseries'},
+    {'label': 'Scatter Plot', 'value': 'scatter'}
+]
+
+
 CARD_STYLE = {
     'width': '35vw',
     'max-height': '33vh',
@@ -188,27 +194,23 @@ class BaseCard(dbc.Card):
 # -----------------------------------------------------------------------------
 
 
-main = [
-    html.H1('Record Collection Analyzer', style=TITLE_STYLE),
-    dbc.Collapse([
-        Options(id='entity_dropdown', title='Entity', options=ENTITY_OPTIONS, default_option=2),
-        Options(id='x_measure', title='Count Measure', options=MEASURE_OPTIONS),
-        Options(id='y_measure', title='Price Measure', options=MEASURE_OPTIONS)
-    ], is_open=False),
-    dbc.Row([
-        dbc.Col([
-            GraphPlus(id='graph1', vh=80, vw=38, show_selection=False),
-        ]),
-        dbc.Col([
-            dbc.Container(id='card_container', fluid=True)
-        ])
-    ])
-]
-
-
 layout_1 = dbc.Container([
     dbc.Row([
-        dbc.Col([html.Pre(id='textplace', style={'color': '#fff'})], width=2),
-        dbc.Col(main)
+        dbc.Col([
+            html.H1('Record Collection Analyzer', style=TITLE_STYLE),
+        ]),
+        dbc.Col([
+            dbc.Button('Analyze', id='analyze_button')
+        ])
+
+    ]),
+    dbc.Row([
+        dbc.Col([
+            GraphPlus(id='graph1', vh=50, vw=45, show_selection=False),
+            GraphPlus(id='graph2', vh=50, vw=45, show_selection=False)
+        ]),
+        dbc.Col([
+            dbc.Container(id='card_container', style={'overflow-y': 'scroll'}, fluid=True)
+        ])
     ])
 ], fluid=True, id='main_container', style=MAIN_STYLE)
