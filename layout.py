@@ -51,8 +51,8 @@ GRAPH_TYPES = [
 
 
 CARD_STYLE = {
-    'width': '35vw',
-    'max-height': '33vh',
+    'width': '300px',
+    'max-height': '20vh',
     'min-height': '10vh',
     'padding': '10px',
     'margin': '15px',
@@ -172,21 +172,15 @@ class BaseCard(dbc.Card):
         Generate components of the card
         """
         self.children = [
-            dbc.Row([
-                dbc.Col([
-                    dbc.CardImg(src=self._image_url),
-                    dbc.CardImgOverlay(
-                        dbc.Button('View Albums', id=self.generate_id('card_button'))
-                    )
-                ], width=4),
-                dbc.Col([
-                    html.H4(
-                        self._title,
-                        style={'color': '#fff', 'margin': '1rem'}),
-                    html.P(self.profile, style={'color': '#fff'}),
-                    dcc.Store(id=self.generate_id('card_store'), data=self._object_id)
-                ], width=8)
-            ]),
+            dcc.Store(id=self.generate_id('card_store'), data=self._object_id),
+            dbc.CardImg(src=self._image_url, id=self.generate_id('image')),
+            # dbc.Popover(self.profile, target=self.generate_id('image'), trigger='hover'),
+            dbc.CardImgOverlay([
+                html.H4(
+                    self._title,
+                    style={'color': '#fff', 'margin': '1rem'}),
+                dbc.Button('View Albums', id=self.generate_id('card_button'))
+            ])
         ]
 
 # -----------------------------------------------------------------------------
@@ -198,19 +192,31 @@ layout_1 = dbc.Container([
     dbc.Row([
         dbc.Col([
             html.H1('Record Collection Analyzer', style=TITLE_STYLE),
-        ]),
+        ], width='auto'),
         dbc.Col([
-            dbc.Button('Analyze', id='analyze_button')
+            dbc.Button('Analyze', id='analyze_button', style={'margin-top': '10px'})
         ])
 
     ]),
     dbc.Row([
         dbc.Col([
-            GraphPlus(id='graph1', vh=50, vw=45, show_selection=False),
-            GraphPlus(id='graph2', vh=50, vw=45, show_selection=False)
+            GraphPlus(id='graph1', vh=45, vw=45, show_selection=False)
         ]),
         dbc.Col([
-            dbc.Container(id='card_container', style={'overflow-y': 'scroll'}, fluid=True)
+            html.Div(
+                id='card_container',
+                style={
+                    'overflow': 'scroll',
+                    'max-height': '50vh',
+                    'max-width': '45vw',
+                    'min-width': '45vw'
+                }
+            )
+        ])
+    ]),
+    dbc.Row([
+        dbc.Col([
+            GraphPlus(id='graph2', vh=45, vw=90, show_selection=False, fluid=True)
         ])
     ])
 ], fluid=True, id='main_container', style=MAIN_STYLE)

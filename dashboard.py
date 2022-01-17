@@ -46,7 +46,6 @@ def update_graph2(card_clicks, card_data):
     return make_timeseries_plot(color_var='title', **conditions)
 
 
-
 @app.callback(Output('card_container', 'children'),
               Input('graph1', 'selectedData'),
               State('graph1_custom_data', 'data'))
