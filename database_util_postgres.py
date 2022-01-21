@@ -42,7 +42,7 @@ def write_rows(df, tbl, returning=None):
     col_names = ','.join(df.columns)
     n_col = df.shape[1]
     fmt = ','.join(['%s'] * n_col)
-    with psycopg2.connect(**DATABASE_KEYS) as conn:
+    with psycopg2.connect(**DB_KEYS_POSTGRES) as conn:
         cur = conn.cursor()
         for idx, row in df.iterrows():
             query = f"INSERT INTO {SCHEMA_NAME}.{tbl}({col_names})\nVALUES ({fmt})\n"
@@ -79,7 +79,7 @@ def read_rows(tbl, **conditions):
         condition_string = ' AND '.join(format_st)
         query += f'WHERE {condition_string}'
     query = punctuate_query(query)
-    with psycopg2.connect(**DATABASE_KEYS) as conn:
+    with psycopg2.connect(**DB_KEYS_POSTGRES) as conn:
         cur = conn.cursor()
         cur.execute(query, cond_values)
         output = pd.DataFrame(

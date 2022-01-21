@@ -9,7 +9,7 @@ import dash_bootstrap_components as dbc
 import webbrowser
 from util import dump_json
 from plotter_util import get_factor, get_buttons_clicked
-from database_util import get_metadata
+from database_util_postgres import get_metadata
 from layout import layout_1, BaseCard, ENTITY_MAP
 from plotter import (
     make_country_plot,

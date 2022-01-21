@@ -6,7 +6,7 @@ Display the data
 """
 
 from util import Randomize, sleep_random
-from database_util import store_release_data
+from database_util_postgres import store_release_data
 from discogs_identity import collection, wantlist
 import argparse
 

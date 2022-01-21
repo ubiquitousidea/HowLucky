@@ -4,7 +4,7 @@ SCHEMA_NAME = 'public'
 
 # historial price data table
 MARKETPLACE_TABLE = 'marketplace'
-
+SEARCH_TABLE = 'search'
 # node tables
 RELEASE_TABLE = 'releases'
 ARTIST_TABLE = 'artists'
@@ -18,4 +18,5 @@ E_LABEL_RELEASE = 'label_release'
 PRICES_VIEW = 'prices'
 
 
-DATABASE_KEYS = load_yaml('keys/database.yaml')
+DB_KEYS_POSTGRES = load_yaml('keys/database_postgres.yaml')
+DB_KEYS_MYSQL = load_yaml('keys/database_mysql.yaml')

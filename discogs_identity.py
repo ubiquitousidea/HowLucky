@@ -2,8 +2,8 @@ from util import load_yaml
 import discogs_client
 
 
-app_keys = load_yaml('keys/appdata.yaml')
-token_info = load_yaml('keys/my_token.yaml')
+app_keys = load_yaml('keys/discogs_howlucky.yaml')
+token_info = load_yaml('keys/discogs_dsnyder427_token.yaml')
 
 d = discogs_client.Client(
     user_agent='HowLucky',

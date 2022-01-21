@@ -1,5 +1,5 @@
 import plotly.express as px
-from database_util import get_price_data
+from database_util_postgres import get_price_data
 
 
 LAYOUT_STYLE = dict(
