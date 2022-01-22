@@ -1,6 +1,8 @@
 from util import load_yaml
+from numpy import nan
 
-SCHEMA_NAME = 'public'
+
+SCHEMA_NAME = 'public'  # postgresql
 
 # historial price data table
 MARKETPLACE_TABLE = 'marketplace'
@@ -19,4 +21,4 @@ PRICES_VIEW = 'prices'
 
 
 DB_KEYS_POSTGRES = load_yaml('keys/database_postgres.yaml')
-DB_KEYS_MYSQL = load_yaml('keys/database_mysql.yaml')
+DB_KEYS_MYSQL = load_yaml('keys/database_mysql_root.yaml')

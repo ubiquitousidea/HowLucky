@@ -131,6 +131,7 @@ def get_price_data(**conditions):
     :return: pandas data frame
     """
     df = read_rows(PRICES_VIEW, **conditions)
+    df = df.sort_values(['release_id', 'when'])
     df['country'].fillna('-', inplace=True)
     df['lowest_price'] = df['lowest_price'].astype(float)
     return df
