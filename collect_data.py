@@ -7,8 +7,10 @@ Display the data
 
 from util import Randomize, sleep_random
 from database_util_postgres import store_release_data
+from database_util_mysql import DBMySQL
 from discogs_identity import collection, wantlist
 import argparse
+from sql.schema import DB_KEYS_MYSQL
 
 # -----------------------------------------------------------------------------
 # - Argument parsing ----------------------------------------------------------
@@ -30,15 +32,22 @@ parser.add_argument(
     help='if 1, store prices, else dont',
     type=int, default=1
 )
+parser.add_argument(
+    '--db',
+    help='which database to use (mysql or postgres)',
+    type=str, default='mysql'
+)
 args = parser.parse_args()
 
 # -----------------------------------------------------------------------------
 # - Store collection info -----------------------------------------------------
 # -----------------------------------------------------------------------------
+db = DBMySQL(DB_KEYS_MYSQL)
 
 for clx in (collection, wantlist):
     for item in Randomize(clx, limit=args.limit):
         release = item.release
+        db.insert_rows()
         store_release_data(
             release,
             store_metadata=args.store_meta,

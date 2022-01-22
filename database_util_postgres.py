@@ -92,7 +92,7 @@ def read_rows(tbl, **conditions):
 # -----------------------------------------------------------------------------
 
 
-def store_release_data(release, store_metadata=True, store_prices=True):
+def store_release_data(release, store_metadata=True, store_prices=True, db='mysql'):
     """
     store the marketplace stats and release info for a release
     :param release: Release object
@@ -102,6 +102,11 @@ def store_release_data(release, store_metadata=True, store_prices=True):
     """
     assert isinstance(release, discogs_client.Release), f'release is {type(release)}'
     print(f'Storing marketplace data for: {release.title} by {release.artists[0].name}')
+
+    if db == 'postgres':
+        pass
+    elif db == 'mysql':
+        pass
     if store_prices:
         marketplace_data = prepare_price_data(release)
         write_rows(marketplace_data, MARKETPLACE_TABLE)
@@ -117,7 +122,10 @@ def store_release_data(release, store_metadata=True, store_prices=True):
             write_rows(labels, LABEL_TABLE)
         except:
             pass
+
+
     return None
+
 
 
 # -----------------------------------------------------------------------------
