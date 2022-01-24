@@ -47,7 +47,6 @@ db = DBMySQL(DB_KEYS_MYSQL)
 for clx in (collection, wantlist):
     for item in Randomize(clx, limit=args.limit):
         release = item.release
-        db.insert_rows()
         store_release_data(
             release,
             store_metadata=args.store_meta,
