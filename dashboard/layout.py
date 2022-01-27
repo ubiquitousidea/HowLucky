@@ -3,6 +3,8 @@ from dash import html
 import dash_bootstrap_components as dbc
 from plotly.graph_objects import Layout, Figure
 from plotter import LAYOUT_STYLE
+import discogs_client
+from data_extractors import *
 
 
 ENTITY_OPTIONS = [
@@ -115,7 +117,8 @@ class GraphPlus(dbc.Container):
                 style={'height': f'{self._vh}vh', 'width': f'{self._vw}vw'},
                 figure=Figure(layout=Layout(**LAYOUT_STYLE))
             ),
-            dcc.Store(id=f'{self.base_id}_custom_data')
+            dcc.Store(id=f'{self.base_id}_custom_data'),
+            dcc.Store(id=f'{self.base_id}_entity')
         ]
         if self._show_selection:
             self.children.append(html.Pre(id=f'{self.base_id}_selection', style={'color': '#fff'}))
@@ -125,47 +128,83 @@ class BaseCard(dbc.Card):
     """
     Class for artist/label/album cards
     """
-    def __init__(self, row):
-        self._entity = None
-        self._id_field = None
-        self._id_value = None
-        self._object_id = None
-        self._image_url = None
-        self._profile = None
-        self._title = None
-        self.set_entity(row)
-        dbc.Card.__init__(
-            self,
-            id=self.generate_id('card'),
-            style=CARD_STYLE)
+    def __init__(self, title, image, text, id_field, id_value):
+        self._title = title
+        self._image = image
+        self._text = text
+        self._id_field = id_field
+        self._id_value = id_value
+        self._object_id = {'field': self._id_field, 'value': self._id_value}
+        dbc.Card.__init__(self, id=self.generate_id('card'), style=CARD_STYLE)
         self.children = []
         self.generate_components()
 
-    def set_entity(self, row, j=0):
+    @classmethod
+    def from_row(cls, row):
+        return cls(
+            title=row['name'],
+            image=row['image'],
+            text=row['profile'],
+            id_field=row.index[0],
+            id_value=row.values[0],
+        )
+
+    @classmethod
+    def from_release(cls, r):
         """
-        set the identity of this object
-        :param row: database row
-        :param j: column index of the id row (default 0)
+        create a card from a Release object
+        :param r: discogs_client.Release object
+        :return: BaseCard object
         """
-        self._entity, _ = row.index[j].split('_')
-        self._id_field = row.index[j]
-        self._id_value = row.values[j]
-        self._object_id = {'field': self._id_field, 'value': self._id_value}
-        self._image_url = row['image']
-        self._profile = row['profile']
-        self._title = row['name']
+        assert isinstance(r, discogs_client.Release)
+        return cls(
+            title=get_title(r),
+            image=get_image_url(r),
+            text=get_profile(r),
+            id_field='release_id',
+            id_value=r.id
+        )
+
+    @classmethod
+    def from_artist(cls, a):
+        """
+        create a card from an Artist object
+        :param a: discogs_client.Artist object
+        :return: BaseCard object
+        """
+        assert isinstance(a, discogs_client.Artist)
+        return cls(
+            title=a.name,
+            image=get_image_url(a),
+            text=get_profile(a),
+            id_field='artist_id',
+            id_value=a.id
+        )
+
+    @classmethod
+    def from_label(cls, item):
+        assert isinstance(item, discogs_client.Artist)
+        return cls(
+            title=item.name,
+            image=get_image_url(item),
+            text=get_profile(item),
+            id_field='label_id',
+            id_value=item.id
+        )
+
+    @classmethod
+    def from_discogs_item(cls, item):
+        if isinstance(item, discogs_client.Artist):
+            return cls.from_artist(item)
+        elif isinstance(item, discogs_client.Label):
+            return cls.from_label(item)
+        elif isinstance(item, discogs_client.Release):
+            return cls.from_release(item)
 
     def generate_id(self, object_type):
         _output = {'object': object_type}
         _output.update(self._object_id)
         return _output
-
-    @property
-    def profile(self):
-        try:
-            return self._profile[:1000]  # truncate to 1000 char
-        except TypeError:
-            return ''
 
     def generate_components(self):
         """
@@ -173,7 +212,7 @@ class BaseCard(dbc.Card):
         """
         self.children = [
             dcc.Store(id=self.generate_id('card_store'), data=self._object_id),
-            dbc.CardImg(src=self._image_url, id=self.generate_id('image')),
+            dbc.CardImg(src=self._image, id=self.generate_id('image')),
             # dbc.Popover(self.profile, target=self.generate_id('image'), trigger='hover'),
             dbc.CardImgOverlay([
                 html.H4(
@@ -203,15 +242,17 @@ layout_1 = dbc.Container([
             GraphPlus(id='graph1', vh=45, vw=45, show_selection=False)
         ]),
         dbc.Col([
-            html.Div(
-                id='card_container',
-                style={
-                    'overflow': 'scroll',
-                    'max-height': '50vh',
-                    'max-width': '45vw',
-                    'min-width': '45vw'
-                }
-            )
+            dbc.Spinner([
+                html.Div(
+                    id='card_container',
+                    style={
+                        'overflow': 'scroll',
+                        'max-height': '50vh',
+                        'max-width': '45vw',
+                        'min-width': '45vw'
+                    }
+                )
+            ], color='info', type='grow', spinner_style={'height': '5rem', 'width': '5rem'})
         ])
     ]),
     dbc.Row([

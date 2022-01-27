@@ -9,6 +9,7 @@ from util import Randomize, sleep_random
 from database_util import store_release_data
 from discogs_identity import collection, wantlist
 import argparse
+from sql.schema import DB_CHOICE
 
 # -----------------------------------------------------------------------------
 # - Argument parsing ----------------------------------------------------------
@@ -33,20 +34,35 @@ parser.add_argument(
 parser.add_argument(
     '--db',
     help='which database to use (mysql or postgres)',
-    type=str, default='mysql'
+    type=str, default=DB_CHOICE
 )
 args = parser.parse_args()
+
+
+for release in RandomReleases():
+    store_release_data(
+        release,
+        store_metadata=args.store_meta,
+        store_prices=args.store_prices,
+        db=args.db
+    )
+    sleep_random()
+
 
 # -----------------------------------------------------------------------------
 # - Store collection info -----------------------------------------------------
 # -----------------------------------------------------------------------------
 
-for clx in (collection, wantlist):
-    for item in Randomize(clx, limit=args.limit):
-        release = item.release
-        store_release_data(
-            release,
-            store_metadata=args.store_meta,
-            store_prices=args.store_prices
-        )
-        sleep_random()
+# for clx in (collection, wantlist):
+#     for item in Randomize(clx, limit=args.limit):
+#         release = item.release
+#         store_release_data(
+#             release,
+#             store_metadata=args.store_meta,
+#             store_prices=args.store_prices,
+#
+#         )
+#         sleep_random()
+
+
+

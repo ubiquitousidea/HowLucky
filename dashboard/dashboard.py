@@ -10,6 +10,7 @@ import webbrowser
 from plotter_util import get_factor, get_buttons_clicked
 from database_util import get_metadata
 from layout import layout_1, BaseCard, ENTITY_MAP
+from discogs_search import get_entity
 from plotter import (
     make_artist_plot,
     make_timeseries_plot
@@ -24,6 +25,7 @@ app.layout = layout_1  # page_layout
 @app.callback(
     Output('graph1', 'figure'),
     Output('graph1_custom_data', 'data'),
+    Output('graph1_entity', 'data'),
     Input('analyze_button', 'n_clicks'))
 def update_graph1(n):
     if not n:
@@ -44,23 +46,26 @@ def update_graph2(card_clicks, card_data):
 
 @app.callback(Output('card_container', 'children'),
               Input('graph1', 'selectedData'),
-              State('graph1_custom_data', 'data'))
-def add_cards(traces, custom_data_labels):
+              State('graph1_custom_data', 'data'),
+              State('graph1_entity', 'data'))
+def add_cards(traces, custom_data_columns, entity):
     """
     generate dash bootstrap cards to represent a selection of point
     :param traces: selected points
-    :param custom_data_labels: list of col names stored in each points' customdata
+    :param custom_data_columns: list of col names stored in each points' customdata
+    :param entity: name of the entity plotted on scatter plot
     :return: list of Cards
     """
-    entity = 'artist'
     if traces is None or len(traces) == 0:
         return []
+    entity = entity[0]
     col_name, color_var = ENTITY_MAP.get(entity)
-    conditions = get_factor(col_name, traces, custom_data_labels)
+    conditions = get_factor(col_name, traces, custom_data_columns)
     card_data = get_metadata(entity, **conditions)
     cards = []
     for idx, row in card_data.iterrows():
-        card = BaseCard(row)
+        item = get_entity(row[col_name], entity)
+        card = BaseCard.from_discogs_item(item)
         cards.append(card)
     return cards
 

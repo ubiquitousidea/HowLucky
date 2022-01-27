@@ -1,24 +1,10 @@
 import discogs_client
 import pandas as pd
-
+from util import just_try
 
 # -----------------------------------------------------------------------------
 # - Data frame preparation functions ------------------------------------------
 # -----------------------------------------------------------------------------
-
-
-def just_try(func):
-    """
-    decorator to default object lookup failure to return an empty string
-    :param func: function to be decorated
-    :return: function that returns blank string if call fails
-    """
-    def wrapper(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except Exception as e:
-            return None
-    return wrapper
 
 
 @just_try
@@ -37,6 +23,11 @@ def get_thumb_url(item):
 
 
 @just_try
+def get_title(release):
+    return release.title
+
+
+@just_try
 def get_profile(item):
     assert isinstance(item, (
         discogs_client.Label,
@@ -48,6 +39,21 @@ def get_profile(item):
 @just_try
 def get_country(release):
     return release.country
+
+
+@just_try
+def get_year(release):
+    return release.year
+
+
+@just_try
+def get_format(release):
+    return release.formats[0]['name']
+
+
+@just_try
+def get_master_id(release):
+    return release.master_id
 
 
 @just_try
@@ -73,16 +79,11 @@ def prepare_price_data(release):
     """
     stats = release.marketplace_stats
     output = {
-        'release_id': release.id
+        'release_id': release.id,
+        'lowest_price': get_lowest_price(stats),
+        'currency': get_lowest_price_currency(stats),
+        'num_for_sale': get_num_for_sale(stats)
     }
-    try:
-        output.update({
-            'lowest_price': get_lowest_price(stats),
-            'currency': get_lowest_price_currency(stats),
-            'num_for_sale': get_num_for_sale(stats)
-        })
-    except AttributeError:
-        pass
     return pd.DataFrame(output, index=[0])
 
 
@@ -94,18 +95,13 @@ def prepare_release_data(release):
     """
     output = {
         'release_id': release.id,
-        'title': release.title,
-        'year': release.year,
+        'title': get_title(release),
+        'year': get_year(release),
         'country': get_country(release),
-        'format': release.formats[0]['name'],
-        'catno': get_catno(release)
+        'format': get_format(release),
+        'catno': get_catno(release),
+        'master_id': get_master_id(release)
     }
-    try:
-        output.update({
-            'master_id': release.master.id
-        })
-    except AttributeError:
-        pass
     return pd.DataFrame(output, index=[0])
 
 
@@ -120,7 +116,6 @@ def prepare_label_data(release):
     labels = [{
         'label_id': label.id,
         'name': label.name,
-        'profile': get_profile(label),
         'image': get_image_url(label)
     } for label in release.labels]
     label_release = [{
@@ -139,7 +134,6 @@ def prepare_artist_data(release):
     artists = [{
         'artist_id': artist.id,
         'name': artist.name,
-        'profile': get_profile(artist),
         'image': get_image_url(artist)
     } for artist in artists]
     artist_release = [{

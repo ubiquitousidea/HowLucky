@@ -8,14 +8,19 @@ from database_util_postgres import DBPostgreSQL
 # -----------------------------------------------------------------------------
 # - Database storage functions ------------------------------------------------
 # -----------------------------------------------------------------------------
-def get_db_object(db):
+def get_db_object(db, noisy=False):
     """
     :param db: str, postgres or mysql
+    :param noisy: if True, print database being used
     :return: BaseDB object
     """
     if db == 'postgres':
+        if noisy:
+            print(f"USING POSTGRES {DB_KEYS_POSTGRES['dbname']}")
         _db = DBPostgreSQL(DB_KEYS_POSTGRES)
     elif db == 'mysql':
+        if noisy:
+            print(f"USING MYSQL DATABASE {DB_KEYS_MYSQL['database']}")
         _db = DBMySQL(DB_KEYS_MYSQL)
     else:
         raise ValueError(f'unknown database {db}')

@@ -80,3 +80,15 @@ def sleep_random(quiet=False):
     return None
 
 
+def just_try(func):
+    """
+    decorator to default object lookup failure to return an empty string
+    :param func: function to be decorated
+    :return: function that returns blank string if call fails
+    """
+    def wrapper(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except Exception as e:
+            return None
+    return wrapper
