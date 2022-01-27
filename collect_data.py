@@ -6,11 +6,9 @@ Display the data
 """
 
 from util import Randomize, sleep_random
-from database_util_postgres import store_release_data
-from database_util_mysql import DBMySQL
+from database_util import store_release_data
 from discogs_identity import collection, wantlist
 import argparse
-from sql.schema import DB_KEYS_MYSQL
 
 # -----------------------------------------------------------------------------
 # - Argument parsing ----------------------------------------------------------
@@ -42,7 +40,6 @@ args = parser.parse_args()
 # -----------------------------------------------------------------------------
 # - Store collection info -----------------------------------------------------
 # -----------------------------------------------------------------------------
-db = DBMySQL(DB_KEYS_MYSQL)
 
 for clx in (collection, wantlist):
     for item in Randomize(clx, limit=args.limit):

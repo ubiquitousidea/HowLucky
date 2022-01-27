@@ -46,3 +46,11 @@ class BaseDB(object):
     @staticmethod
     def _row_str(n, fmt='%s'):
         return ','.join([fmt] * n)
+
+    @staticmethod
+    def data_to_dict(data):
+        try:
+            data = data.to_dict('records')
+        except:
+            pass
+        return data

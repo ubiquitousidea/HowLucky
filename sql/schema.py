@@ -1,7 +1,7 @@
 from util import load_yaml
-from numpy import nan
 
 
+DB_CHOICE = 'postgres'
 SCHEMA_NAME = 'public'  # postgresql
 
 # historial price data table

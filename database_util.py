@@ -8,8 +8,21 @@ from database_util_postgres import DBPostgreSQL
 # -----------------------------------------------------------------------------
 # - Database storage functions ------------------------------------------------
 # -----------------------------------------------------------------------------
+def get_db_object(db):
+    """
+    :param db: str, postgres or mysql
+    :return: BaseDB object
+    """
+    if db == 'postgres':
+        _db = DBPostgreSQL(DB_KEYS_POSTGRES)
+    elif db == 'mysql':
+        _db = DBMySQL(DB_KEYS_MYSQL)
+    else:
+        raise ValueError(f'unknown database {db}')
+    return _db
 
-def store_release_data(release, store_metadata=True, store_prices=True, db='mysql'):
+
+def store_release_data(release, store_metadata=True, store_prices=True, db=DB_CHOICE):
     """
     store the marketplace stats and release info for a release
     :param release: Release object
@@ -21,12 +34,7 @@ def store_release_data(release, store_metadata=True, store_prices=True, db='mysq
     assert isinstance(release, discogs_client.Release), f'release is {type(release)}'
     print(f'Storing marketplace data for: {release.title} by {release.artists[0].name}')
 
-    if db == 'postgres':
-        _db = DBPostgreSQL(DB_KEYS_POSTGRES)
-    elif db == 'mysql':
-        _db = DBMySQL(DB_KEYS_MYSQL)
-    else:
-        raise ValueError(f'unknown database {db}')
+    _db = get_db_object(db)
     if store_prices:
         marketplace_data = prepare_price_data(release)
         _db.insert_rows(marketplace_data, MARKETPLACE_TABLE)
@@ -52,32 +60,29 @@ def store_release_data(release, store_metadata=True, store_prices=True, db='mysq
 # -----------------------------------------------------------------------------
 
 
-def get_price_data(**conditions):
+def get_price_data(db=DB_CHOICE, **conditions):
     """
     get marketplace data from the local database for releases matching certain conditions
+    :param db: str, which database to use (mysql or postgres)
     :return: pandas data frame
     """
-
-    df = read_rows(PRICES_VIEW, **conditions)
+    _db = get_db_object(db)
+    df = _db.read_rows(PRICES_VIEW, **conditions)
     df = df.sort_values(['release_id', 'when'])
+    # print(df.columns)
     df['country'].fillna('-', inplace=True)
     df['lowest_price'] = df['lowest_price'].astype(float)
     return df
 
 
-def get_metadata(entity, **conditions):
-    """
-    get metadata on
-    :param entity:
-    :param conditions:
-    :return:
-    """
+def get_metadata(entity, db=DB_CHOICE, **conditions):
+    _db = get_db_object(db)
     if entity == 'label':
-        output = read_rows(LABEL_TABLE, **conditions)
+        output = _db.read_rows(LABEL_TABLE, **conditions)
     elif entity == 'artist':
-        output = read_rows(ARTIST_TABLE, **conditions)
+        output = _db.read_rows(ARTIST_TABLE, **conditions)
     elif entity == 'album':
-        output = read_rows(RELEASE_TABLE, **conditions)
+        output = _db.read_rows(RELEASE_TABLE, **conditions)
     else:
         raise TypeError(f'bad entity {entity}')
     return output

@@ -1,5 +1,6 @@
 from database_classes import BaseDB
 import mysql.connector
+import pandas as pd
 
 
 class DBMySQL(BaseDB):
@@ -33,6 +34,7 @@ class DBMySQL(BaseDB):
         :param returning: str or list of strings, columns to return
         :return: dictionary of returned values if returning is not None
         """
+        data = self.data_to_dict(data)
         assert self._valid_schema(data), 'schema error in data'
         col_names = self._comma_separate(data[0].keys(), backtick=True)
         n_col = len(data[0])
@@ -45,11 +47,38 @@ class DBMySQL(BaseDB):
         for row in data:
             values.extend(list(row.values()))
         values = tuple(values)
-        return self._execute(query, values)
+        return self._execute(query, values, commit=True)
 
-    def _execute(self, query, values):
+    def read_rows(self, table, **conditions):
+        query = f'select * from {self.database}.{table} '
+        cond_values = None  # this name needs to be defined for cur.execute to run
+        if len(conditions) > 0:
+            cond_values = []
+            format_st = []
+            for colname, values in conditions.items():
+                n = len(values)
+                _ = ','.join(['%s'] * n)
+                fmt = f'{colname} in ({_})'
+                format_st.append(fmt)
+                cond_values.extend(values)
+            condition_string = ' AND '.join(format_st)
+            query += f'WHERE {condition_string}'
+        output = self._execute(query, cond_values)
+        return output
+
+    def _execute(self, query, values, commit=False):
         query = self._validate(query)
         with mysql.connector.connect(**self.credentials) as con:
             cur = con.cursor()
             cur.execute(query, values)
-            con.commit()
+            if commit is True:
+                con.commit()
+            try:
+                output = pd.DataFrame(
+                    cur.fetchall(),
+                    columns=[_[0] for _ in cur.description]
+                )
+            except:
+                output = None
+        return output
+

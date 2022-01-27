@@ -1,7 +1,8 @@
 import numpy as np
 import psycopg2
 from psycopg2.extensions import register_adapter, AsIs
-from data_extractors import *
+from data_extractors import get_catno, get_country, get_profile, get_thumb_url, get_image_url, get_lowest_price, get_lowest_price_currency, get_num_for_sale
+import pandas as pd
 from sql.schema import SCHEMA_NAME
 from database_classes import BaseDB
 

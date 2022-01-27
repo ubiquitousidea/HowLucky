@@ -1,7 +1,5 @@
 import numpy as np
-from database_util_mysql import DBMySQL
-from database_util_postgres import read_rows as read_rows_postgres
-from util import load_yaml
+from database_util import get_db_object
 
 
 migration_control = dict(
@@ -13,26 +11,19 @@ migration_control = dict(
     label_release=True
 )
 
-
-KEYS = load_yaml('keys/database_mysql_root.yaml')
-db = DBMySQL(KEYS)
-
+db_from = get_db_object('mysql')
+db_to = get_db_object('postgres')
 
 for table, migrate in migration_control.items():
+
     if migrate:
         print(f'migrating table {table}')
-        df = read_rows_postgres(table)
+        df = db_from.read_rows(table)
         df = df.replace({np.nan: None})
         if table == 'marketplace':
             df = df.drop('qid', axis=1)
-        elif table == 'labels' or table == 'artists':
+        try:
             df = df.drop('profile', axis=1)
-        else:
+        except:
             pass
-        db.insert_rows(df.to_dict('records'), table)
-
-
-# q = '''
-# insert into vinyl.marketplace (release_id, lowest_price, currency, num_for_sale, `when`)
-# values(%s, %s, %s, %s, %s);
-# '''
+        db_to.insert_rows(df, table)
