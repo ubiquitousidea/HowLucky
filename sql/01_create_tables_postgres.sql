@@ -1,30 +1,3 @@
--- Database: dsnyder
-
--- DROP DATABASE IF EXISTS dsnyder;
-
-CREATE DATABASE dsnyder
-    WITH
-    OWNER = dsnyder
-    ENCODING = 'UTF8'
-    LC_COLLATE = 'en_US.UTF-8'
-    LC_CTYPE = 'en_US.UTF-8'
-    TABLESPACE = pg_default
-    CONNECTION LIMIT = -1;
-
-
--- Role: dsnyder
--- DROP ROLE IF EXISTS dsnyder;
-
-CREATE ROLE dsnyder WITH
-  LOGIN
-  SUPERUSER
-  INHERIT
-  CREATEDB
-  CREATEROLE
-  NOREPLICATION
-  ENCRYPTED PASSWORD 'md533396353073c2e3358f7fb9f02a401c5';
-
-
 -- SEQUENCE: public.marketplace_qid_seq
 
 -- DROP SEQUENCE IF EXISTS public.marketplace_qid_seq;
@@ -34,8 +7,7 @@ CREATE SEQUENCE IF NOT EXISTS public.marketplace_qid_seq
     START 1
     MINVALUE 1
     MAXVALUE 9223372036854775807
-    CACHE 1
-    OWNED BY marketplace.qid;
+    CACHE 1;
 
 ALTER SEQUENCE public.marketplace_qid_seq
     OWNER TO dsnyder;

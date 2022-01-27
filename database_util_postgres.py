@@ -50,7 +50,7 @@ class DBPostgreSQL(BaseDB):
         :param returning:
         :return: None
         """
-        col_names = ','.join(df.columns)
+        col_names = self._prepare_col_names(df)
         n_col = df.shape[1]
         fmt = ','.join(['%s'] * n_col)
         with psycopg2.connect(**self.credentials) as conn:

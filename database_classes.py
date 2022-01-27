@@ -3,16 +3,18 @@ class BaseDB(object):
         pass
 
     @staticmethod
-    def _enquote_values(values, backtick=False):
+    def _enquote_values(values, backtick=False, double_quote=False):
         if backtick is True:
             output = [f'`{v}`' for v in values]
+        elif double_quote is True:
+            output = [f'\"{v}\"' for v in values]
         else:
             output = [f'\'{v}\'' for v in values]
         return output
 
-    def _comma_separate(self, values, quote=False, backtick=False):
-        if quote is True or backtick is True:
-            output = ','.join(self._enquote_values(values, backtick))
+    def _comma_separate(self, values, quote=False, backtick=False, double_quote=False):
+        if quote is True or double_quote is True or backtick is True:
+            output = ','.join(self._enquote_values(values, backtick, double_quote))
         else:
             output = ','.join(values)
         return output
@@ -54,3 +56,7 @@ class BaseDB(object):
         except:
             pass
         return data
+
+    def _prepare_col_names(self, df):
+        labels = df.columns.tolist()
+        return self._comma_separate(labels, double_quote=True)
