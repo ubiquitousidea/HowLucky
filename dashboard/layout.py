@@ -3,7 +3,6 @@ from dash import html
 import dash_bootstrap_components as dbc
 from plotly.graph_objects import Layout, Figure
 from plotter import LAYOUT_STYLE
-import discogs_client
 from data_extractors import *
 
 

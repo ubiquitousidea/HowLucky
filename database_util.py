@@ -1,4 +1,3 @@
-import discogs_client
 from sql.schema import *
 from data_extractors import *
 from database_util_mysql import DBMySQL

@@ -38,31 +38,27 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-
-for release in RandomReleases():
-    store_release_data(
-        release,
-        store_metadata=args.store_meta,
-        store_prices=args.store_prices,
-        db=args.db
-    )
-    sleep_random()
+#
+# for release in RandomReleases():
+#     store_release_data(
+#         release,
+#         store_metadata=args.store_meta,
+#         store_prices=args.store_prices,
+#         db=args.db
+#     )
+#     sleep_random()
 
 
 # -----------------------------------------------------------------------------
 # - Store collection info -----------------------------------------------------
 # -----------------------------------------------------------------------------
 
-# for clx in (collection, wantlist):
-#     for item in Randomize(clx, limit=args.limit):
-#         release = item.release
-#         store_release_data(
-#             release,
-#             store_metadata=args.store_meta,
-#             store_prices=args.store_prices,
-#
-#         )
-#         sleep_random()
-
-
-
+for clx in (collection, wantlist):
+    for item in Randomize(clx, limit=args.limit):
+        release = item.release
+        store_release_data(
+            release,
+            store_metadata=args.store_meta,
+            store_prices=args.store_prices,
+        )
+        sleep_random()
