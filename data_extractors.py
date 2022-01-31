@@ -53,7 +53,7 @@ def get_format(release):
 
 @just_try
 def get_master_id(release):
-    return release.master_id
+    return release.master.id
 
 
 @just_try
@@ -100,7 +100,8 @@ def prepare_release_data(release):
         'country': get_country(release),
         'format': get_format(release),
         'catno': get_catno(release),
-        'master_id': get_master_id(release)
+        'master_id': get_master_id(release),
+        'image': get_image_url(release)
     }
     return pd.DataFrame(output, index=[0])
 

@@ -183,7 +183,7 @@ def make_timeseries_plot(color_var, y_var='lowest_price', **conditions):
     """
     df = get_price_data(**conditions)
     custom_data = [
-        'title', 'artist', 'num_for_sale', 'lowest_price', 'year',
+        'catno', 'title', 'artist', 'num_for_sale', 'lowest_price', 'year',
         'artist_id', 'release_id', 'label', 'label_id', 'country']
     fig = px.line(
         df,
@@ -200,18 +200,19 @@ def make_timeseries_plot(color_var, y_var='lowest_price', **conditions):
             'country': 'Country',
             'label': 'Record Label',
             'title': 'Album Title',
-            'artist': 'Artist'
+            'artist': 'Artist',
+            'catno': 'Catalog Number'
         },
         title="Album Prices over Time"
     )
     fig.update_traces(
         hovertemplate=(
-            '<b>Album</b>: %{customdata[0]}<br>'
-            '<b>Artist</b>: %{customdata[1]}<br>'
-            '<b>Label</b>: %{customdata[7]} (%{customdata[9]} %{customdata[4]})<br>'
+            '<b>Album</b>: %{customdata[1]} (%{customdata[0]})<br>'
+            '<b>Artist</b>: %{customdata[2]}<br>'
+            '<b>Label</b>: %{customdata[8]} (%{customdata[10]} %{customdata[5]})<br>'
             'Date: %{x}<br>'
-            'Lowest Price: %{customdata[3]:$.2f}<br>'
-            'Number for Sale: %{customdata[2]}'
+            'Lowest Price: %{customdata[4]:$.2f}<br>'
+            'Number for Sale: %{customdata[3]}'
         )
     )
     y_max = 1.05 * df[y_var].astype(float).max()

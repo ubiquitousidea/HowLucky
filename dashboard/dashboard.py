@@ -10,7 +10,6 @@ import webbrowser
 from plotter_util import get_factor, get_buttons_clicked
 from database_util import get_metadata
 from layout import layout_1, BaseCard, ENTITY_MAP
-from discogs_search import get_entity
 from plotter import (
     make_artist_plot,
     make_timeseries_plot
@@ -36,12 +35,13 @@ def update_graph1(n):
 @app.callback(Output('graph2', 'figure'),
               Output('graph2_custom_data', 'data'),
               Input({'object': 'card_button', 'field': ALL, 'value': ALL}, 'n_clicks'),
+              Input('graph2_options', 'value'),
               State({'object': 'card_store', 'field': ALL, 'value': ALL}, 'data'))
-def update_graph2(card_clicks, card_data):
+def update_graph2(card_clicks, y_var, card_data):
     conditions = get_buttons_clicked(card_data, card_clicks)
     if not conditions:
         raise PreventUpdate
-    return make_timeseries_plot(color_var='title', **conditions)
+    return make_timeseries_plot(color_var='title', y_var=y_var, **conditions)
 
 
 @app.callback(Output('card_container', 'children'),
@@ -64,8 +64,7 @@ def add_cards(traces, custom_data_columns, entity):
     card_data = get_metadata(entity, **conditions)
     cards = []
     for idx, row in card_data.iterrows():
-        item = get_entity(row[col_name], entity)
-        card = BaseCard.from_discogs_item(item)
+        card = BaseCard.from_row(row)
         cards.append(card)
     return cards
 

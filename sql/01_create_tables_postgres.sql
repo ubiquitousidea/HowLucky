@@ -25,6 +25,7 @@ CREATE TABLE IF NOT EXISTS public.releases
     master_id bigint,
     format text COLLATE pg_catalog."default",
     catno character varying(32) COLLATE pg_catalog."default",
+    image text COLLATE pg_catalog."default",
     CONSTRAINT releases_pkey PRIMARY KEY (release_id)
 )
 
@@ -144,6 +145,7 @@ CREATE OR REPLACE VIEW public.prices
  AS
  SELECT marketplace.release_id,
     releases.title,
+    releases.catno,
     releases.year,
     releases.country,
     releases.master_id,

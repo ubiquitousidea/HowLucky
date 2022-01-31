@@ -3,6 +3,8 @@ import yaml
 from numpy.random import permutation, exponential
 from yaml import Loader, Dumper
 from json import dumps
+from PIL import Image
+from numpy import array
 
 
 # -----------------------------------------------------------------------------
@@ -92,3 +94,17 @@ def just_try(func):
         except Exception as e:
             return None
     return wrapper
+
+
+
+# - Color operations -
+
+def opposite_color(path):
+    """
+    :param imgurl: image url
+    :return: opposite average color
+    """
+    average_color = array(Image.open(path)).mean(axis=0).mean(axis=0)
+    return array([255, 255, 255]) - average_color
+
+

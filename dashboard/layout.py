@@ -3,6 +3,7 @@ from dash import html
 import dash_bootstrap_components as dbc
 from plotly.graph_objects import Layout, Figure
 from plotter import LAYOUT_STYLE
+from util import opposite_color
 from data_extractors import *
 
 
@@ -33,7 +34,8 @@ MAIN_STYLE = {
 TITLE_STYLE = {
     'color': '#EEEEEE',
     'background-color': '#252525',
-    'margin': '4px'
+    'margin': '4px',
+    'width': '100%'
 }
 
 
@@ -52,11 +54,11 @@ GRAPH_TYPES = [
 
 
 CARD_STYLE = {
-    'width': '300px',
+    'width': '20vw',
     'max-height': '20vh',
-    'min-height': '10vh',
+    'min-height': '20vh',
     'padding': '10px',
-    'margin': '15px',
+    'margin': '5px',
     'background-color': '#333340'
 }
 
@@ -140,65 +142,38 @@ class BaseCard(dbc.Card):
 
     @classmethod
     def from_row(cls, row):
+        try:
+            title = row['name']
+        except:
+            title = row['title']
         return cls(
-            title=row['name'],
+            title=title,
             image=row['image'],
-            text=row['profile'],
+            text='',
             id_field=row.index[0],
             id_value=row.values[0],
         )
 
     @classmethod
-    def from_release(cls, r):
-        """
-        create a card from a Release object
-        :param r: discogs_client.Release object
-        :return: BaseCard object
-        """
-        assert isinstance(r, discogs_client.Release)
-        return cls(
-            title=get_title(r),
-            image=get_image_url(r),
-            text=get_profile(r),
-            id_field='release_id',
-            id_value=r.id
-        )
-
-    @classmethod
-    def from_artist(cls, a):
-        """
-        create a card from an Artist object
-        :param a: discogs_client.Artist object
-        :return: BaseCard object
-        """
-        assert isinstance(a, discogs_client.Artist)
-        return cls(
-            title=a.name,
-            image=get_image_url(a),
-            text=get_profile(a),
-            id_field='artist_id',
-            id_value=a.id
-        )
-
-    @classmethod
-    def from_label(cls, item):
-        assert isinstance(item, discogs_client.Artist)
-        return cls(
-            title=item.name,
-            image=get_image_url(item),
-            text=get_profile(item),
-            id_field='label_id',
-            id_value=item.id
-        )
-
-    @classmethod
     def from_discogs_item(cls, item):
         if isinstance(item, discogs_client.Artist):
-            return cls.from_artist(item)
+            id_field = 'artist_id'
+            title = item.name
         elif isinstance(item, discogs_client.Label):
-            return cls.from_label(item)
+            id_field = 'label_id'
+            title = item.name
         elif isinstance(item, discogs_client.Release):
-            return cls.from_release(item)
+            id_field = 'release_id'
+            title = item.title
+        else:
+            raise ValueError(f'unknown type of {item}: {type(item)}')
+        return cls(
+            title=title,
+            image=get_image_url(item),
+            text='',
+            id_field=id_field,
+            id_value=item.id
+        )
 
     def generate_id(self, object_type):
         _output = {'object': object_type}
@@ -210,15 +185,16 @@ class BaseCard(dbc.Card):
         Generate components of the card
         """
         self.children = [
+            dbc.CardBody([
+                dbc.CardImg(src=self._image, id=self.generate_id('image')),
+                dbc.CardImgOverlay([
+                    html.H4(
+                        self._title,
+                        style={'color': '#000000', 'margin': '1rem'}),
+                    dbc.Button('View Albums', id=self.generate_id('card_button'))
+                ])
+            ]),
             dcc.Store(id=self.generate_id('card_store'), data=self._object_id),
-            dbc.CardImg(src=self._image, id=self.generate_id('image')),
-            # dbc.Popover(self.profile, target=self.generate_id('image'), trigger='hover'),
-            dbc.CardImgOverlay([
-                html.H4(
-                    self._title,
-                    style={'color': '#fff', 'margin': '1rem'}),
-                dbc.Button('View Albums', id=self.generate_id('card_button'))
-            ])
         ]
 
 # -----------------------------------------------------------------------------
@@ -233,8 +209,10 @@ layout_1 = dbc.Container([
         ], width='auto'),
         dbc.Col([
             dbc.Button('Analyze', id='analyze_button', style={'margin-top': '10px'})
+        ], width='auto'),
+        dbc.Col([
+            dbc.Input(id='search-box', type='text', style={'margin': '10px', 'width': '500px'})
         ])
-
     ]),
     dbc.Row([
         dbc.Col([
@@ -253,6 +231,11 @@ layout_1 = dbc.Container([
                 )
             ], color='info', type='grow', spinner_style={'height': '5rem', 'width': '5rem'})
         ])
+    ]),
+    dbc.Row([
+        dbc.Col([
+            Options(id='graph2_options', title='Measure', options=YAXIS_OPTIONS),
+        ], width=4)
     ]),
     dbc.Row([
         dbc.Col([
