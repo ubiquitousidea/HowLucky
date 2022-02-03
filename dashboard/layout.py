@@ -3,7 +3,6 @@ from dash import html
 import dash_bootstrap_components as dbc
 from plotly.graph_objects import Layout, Figure
 from plotter import LAYOUT_STYLE
-from util import opposite_color
 from data_extractors import *
 
 
@@ -54,9 +53,10 @@ GRAPH_TYPES = [
 
 
 CARD_STYLE = {
-    'width': '20vw',
-    'max-height': '20vh',
-    'min-height': '20vh',
+    'min-width': '14vw',
+    'max-width': '14vw',
+    'max-height': '10vh',
+    'min-height': '10vh',
     'padding': '10px',
     'margin': '5px',
     'background-color': '#333340'
@@ -185,16 +185,21 @@ class BaseCard(dbc.Card):
         Generate components of the card
         """
         self.children = [
-            dbc.CardBody([
-                dbc.CardImg(src=self._image, id=self.generate_id('image')),
-                dbc.CardImgOverlay([
-                    html.H4(
-                        self._title,
-                        style={'color': '#000000', 'margin': '1rem'}),
-                    dbc.Button('View Albums', id=self.generate_id('card_button'))
+            dbc.Row([
+                dbc.Col([
+                    dbc.CardImg(src=self._image, id=self.generate_id('image')),
+                    dcc.Store(id=self.generate_id('card_store'), data=self._object_id),
+                ], width=4),
+                dbc.Col([
+                    dbc.CardBody([
+                        html.H4(
+                            self._title,
+                            style={'color': '#FFF', 'margin': '5px'}),
+                        dbc.Button('View Albums', id=self.generate_id('card_button'))
+                    ])
                 ])
             ]),
-            dcc.Store(id=self.generate_id('card_store'), data=self._object_id),
+
         ]
 
 # -----------------------------------------------------------------------------
@@ -220,10 +225,11 @@ layout_1 = dbc.Container([
         ]),
         dbc.Col([
             dbc.Spinner([
-                html.Div(
+                dbc.CardGroup(
                     id='card_container',
                     style={
                         'overflow': 'scroll',
+                        'min-height': '50vh',
                         'max-height': '50vh',
                         'max-width': '45vw',
                         'min-width': '45vw'
