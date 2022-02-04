@@ -221,6 +221,14 @@ layout_1 = dbc.Container([
     ]),
     dbc.Row([
         dbc.Col([
+            Options(
+                id='axis_type',
+                title='Axis Type',
+                options=[
+                    {'label': 'Log', 'value': 'log'},
+                    {'label': 'Linear', 'value': 'linear'}
+                ]
+            ),
             GraphPlus(id='graph1', vh=45, vw=45, show_selection=False)
         ]),
         dbc.Col([

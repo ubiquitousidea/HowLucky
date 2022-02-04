@@ -45,7 +45,7 @@ def aggregate_prices(groupings, x_measure, y_measure, **conditions):
         }).rename(columns={'title': 'count'}))
 
 
-def agg_plot(groupings, title, x_measure='median', y_measure='median', **conditions):
+def agg_plot(groupings, title, x_measure='median', y_measure='median', loglog=True, **conditions):
     """
     group the price data and aggregate price and supply
     :param groupings: list of names of categorical columns for grouping the marketplace data
@@ -62,8 +62,8 @@ def agg_plot(groupings, title, x_measure='median', y_measure='median', **conditi
         size='count',
         color='count',
         custom_data=groupings,
-        log_x=True,
-        log_y=True,
+        log_x=loglog,
+        log_y=loglog,
         labels={
             'num_for_sale': 'Number for Sale',
             'lowest_price': 'Lowest Price',
@@ -125,7 +125,7 @@ def make_label_plot(x_measure='median', y_measure='median'):
     return fig, groupings, ['label']
 
 
-def make_artist_plot(x_measure='median', y_measure='median'):
+def make_artist_plot(x_measure='median', y_measure='median', loglog=True):
     """
     produce a plot representing each artist in the data
     :return: Figure
@@ -135,7 +135,9 @@ def make_artist_plot(x_measure='median', y_measure='median'):
         groupings=groupings,
         title='Artists: Price vs. Supply',
         x_measure=x_measure,
-        y_measure=y_measure)
+        y_measure=y_measure,
+        loglog=loglog
+    )
     fig.update_layout(**LAYOUT_STYLE)
     fig.update_layout(**YAXIS_MONEY_FORMAT)
     fig.update_traces(
@@ -208,6 +210,7 @@ def make_timeseries_plot(color_var, y_var='lowest_price', **conditions):
     fig.update_traces(
         hovertemplate=(
             '<b>Album</b>: %{customdata[1]} (%{customdata[0]})<br>'
+            'Release ID: %{customdata[7]}<br>'
             '<b>Artist</b>: %{customdata[2]}<br>'
             '<b>Label</b>: %{customdata[8]} (%{customdata[10]} %{customdata[5]})<br>'
             'Date: %{x}<br>'

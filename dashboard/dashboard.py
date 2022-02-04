@@ -25,11 +25,12 @@ app.layout = layout_1  # page_layout
     Output('graph1', 'figure'),
     Output('graph1_custom_data', 'data'),
     Output('graph1_entity', 'data'),
-    Input('analyze_button', 'n_clicks'))
-def update_graph1(n):
+    Input('analyze_button', 'n_clicks'),
+    Input('axis_type', 'value'))
+def update_graph1(n, at):
     if not n:
         raise PreventUpdate
-    return make_artist_plot()
+    return make_artist_plot(loglog=('log' in at))
 
 
 @app.callback(Output('graph2', 'figure'),
