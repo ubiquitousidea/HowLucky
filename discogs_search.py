@@ -10,3 +10,7 @@ def get_entity(entity_id, entity):
         return d.artist(entity_id)
     elif entity == 'label':
         return d.label(entity_id)
+    elif entity == 'master':
+        return d.master(entity_id)
+    else:
+        raise ValueError(f'unknown entity: {entity}')

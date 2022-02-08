@@ -165,6 +165,7 @@ def make_album_plot(x_measure='median', y_measure='median', **conditions):
         hovertemplate=(
             '<b>Artist</b>: %{customdata[0]}<br>'
             '<b>Album</b>: %{customdata[1]}<br>'
+            '<extra></extra>'
         ) + gen_xy_hover_template(x_measure, y_measure)
     )
     return fig, groupings, ['release']
@@ -209,13 +210,14 @@ def make_timeseries_plot(color_var, y_var='lowest_price', **conditions):
     )
     fig.update_traces(
         hovertemplate=(
-            '<b>Album</b>: %{customdata[1]} (%{customdata[0]})<br>'
-            'Release ID: %{customdata[7]}<br>'
+            '<b>Title</b>: %{customdata[1]} (%{customdata[0]})<br>'
             '<b>Artist</b>: %{customdata[2]}<br>'
             '<b>Label</b>: %{customdata[8]} (%{customdata[10]} %{customdata[5]})<br>'
+            'Release ID: %{customdata[7]}<br>'
             'Date: %{x}<br>'
             'Lowest Price: %{customdata[4]:$.2f}<br>'
             'Number for Sale: %{customdata[3]}'
+            '<extra></extra>'
         )
     )
     y_max = 1.05 * df[y_var].astype(float).max()

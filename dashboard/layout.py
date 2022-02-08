@@ -4,6 +4,7 @@ import dash_bootstrap_components as dbc
 from plotly.graph_objects import Layout, Figure
 from plotter import LAYOUT_STYLE
 from data_extractors import *
+from database_util import get_metadata
 
 
 ENTITY_OPTIONS = [
@@ -59,7 +60,8 @@ CARD_STYLE = {
     'min-height': '10vh',
     'padding': '10px',
     'margin': '5px',
-    'background-color': '#333340'
+    'background-color': '#333340',
+    'border-radius': '10px'
 }
 
 
@@ -207,6 +209,11 @@ class BaseCard(dbc.Card):
 # -----------------------------------------------------------------------------
 
 
+def artist_options():
+    artists = get_metadata('artist')
+    return [html.Option(value=a) for a in artists['name'].tolist()]
+
+
 layout_1 = dbc.Container([
     dbc.Row([
         dbc.Col([
@@ -216,7 +223,12 @@ layout_1 = dbc.Container([
             dbc.Button('Analyze', id='analyze_button', style={'margin-top': '10px'})
         ], width='auto'),
         dbc.Col([
-            dbc.Input(id='search-box', type='text', style={'margin': '10px', 'width': '500px'})
+            dbc.Input(
+                id='search-box',
+                list='artists',
+                type='text',
+                style={'margin': '10px', 'width': '500px'}),
+            html.Datalist(artist_options(), id='artists')
         ])
     ]),
     dbc.Row([

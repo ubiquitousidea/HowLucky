@@ -144,3 +144,4 @@ def prepare_artist_data(release):
         pd.DataFrame(artist_release, index=range(n_artists)),
         pd.DataFrame(artists, index=range(n_artists))
     )
+
