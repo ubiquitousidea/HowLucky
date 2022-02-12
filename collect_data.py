@@ -38,7 +38,7 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-#
+
 # for release in RandomReleases():
 #     store_release_data(
 #         release,

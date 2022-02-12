@@ -3,13 +3,15 @@ create a dashboard to view and analyze the collected data
 """
 
 import dash
+import json
 from dash.dependencies import Input, Output, State, ALL
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 import webbrowser
 from plotter_util import get_factor, get_buttons_clicked
 from database_util import get_metadata
-from layout import layout_1, BaseCard, ENTITY_MAP
+from discogs_search import get_entity
+from layout import layout_1, BaseCard, ENTITY_MAP, CARD_STYLE
 from plotter import (
     make_artist_plot,
     make_timeseries_plot
@@ -65,12 +67,29 @@ def add_cards(traces, custom_data_columns, entity):
     card_data = get_metadata(entity, **conditions)
     cards = []
     for idx, row in card_data.iterrows():
-        card = BaseCard.from_row(row)
+        card = BaseCard.from_row(row, style=CARD_STYLE)
         cards.append(card)
     return cards
 
 
+@app.callback(Output('release_card_col', 'children'),
+              Input('graph2', 'selectedData'),
+              State('graph2_custom_data', 'data'))
+def show_release_card(clickdata, customdata):
+    # print(json.dumps(clickdata, indent=4, sort_keys=True))
+    rid = get_factor('release_id', clickdata, customdata)['release_id'][0]
+    release = get_entity(rid, 'release')
+    style = CARD_STYLE.copy()
+    style.update({
+        'min-height': '20vh',
+        'max-height': '20vh',
+        'min-width': '20vw',
+        'max-width': '20vw'
+    })
+    return BaseCard.from_discogs_item(release, style)
+
+
 if __name__ == '__main__':
-    port = 8058
+    port = 8052
     webbrowser.open(f'http://127.0.0.1:{port}')
     app.run_server(port=port, debug=False)

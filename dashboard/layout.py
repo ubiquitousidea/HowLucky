@@ -131,19 +131,19 @@ class BaseCard(dbc.Card):
     """
     Class for artist/label/album cards
     """
-    def __init__(self, title, image, text, id_field, id_value):
+    def __init__(self, title, image, text, id_field, id_value, style):
         self._title = title
         self._image = image
         self._text = text
         self._id_field = id_field
         self._id_value = id_value
         self._object_id = {'field': self._id_field, 'value': self._id_value}
-        dbc.Card.__init__(self, id=self.generate_id('card'), style=CARD_STYLE)
+        dbc.Card.__init__(self, id=self.generate_id('card'), style=style)
         self.children = []
         self.generate_components()
 
     @classmethod
-    def from_row(cls, row):
+    def from_row(cls, row, style):
         try:
             title = row['name']
         except:
@@ -154,10 +154,11 @@ class BaseCard(dbc.Card):
             text='',
             id_field=row.index[0],
             id_value=row.values[0],
+            style=style
         )
 
     @classmethod
-    def from_discogs_item(cls, item):
+    def from_discogs_item(cls, item, style):
         if isinstance(item, discogs_client.Artist):
             id_field = 'artist_id'
             title = item.name
@@ -174,7 +175,8 @@ class BaseCard(dbc.Card):
             image=get_image_url(item),
             text='',
             id_field=id_field,
-            id_value=item.id
+            id_value=item.id,
+            style=style
         )
 
     def generate_id(self, object_type):
@@ -242,7 +244,7 @@ layout_1 = dbc.Container([
                 ]
             ),
             GraphPlus(id='graph1', vh=45, vw=45, show_selection=False)
-        ]),
+        ], width='auto'),
         dbc.Col([
             dbc.Spinner([
                 dbc.CardGroup(
@@ -261,11 +263,12 @@ layout_1 = dbc.Container([
     dbc.Row([
         dbc.Col([
             Options(id='graph2_options', title='Measure', options=YAXIS_OPTIONS),
-        ], width=4)
+        ], width='auto')
     ]),
     dbc.Row([
         dbc.Col([
-            GraphPlus(id='graph2', vh=45, vw=90, show_selection=False, fluid=True)
-        ])
+            GraphPlus(id='graph2', vh=45, vw=60, show_selection=False, fluid=True)
+        ]),
+        dbc.Col(id='release_card_col')
     ])
 ], fluid=True, id='main_container', style=MAIN_STYLE)
