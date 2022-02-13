@@ -11,7 +11,7 @@ import webbrowser
 from plotter_util import get_factor, get_buttons_clicked
 from database_util import get_metadata
 from discogs_search import get_entity
-from layout import layout_1, BaseCard, ENTITY_MAP, CARD_STYLE
+from layout import main_layout, ENTITY_MAP, ArtistCard, AlbumCard
 from plotter import (
     make_artist_plot,
     make_timeseries_plot
@@ -20,7 +20,7 @@ from plotter import (
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 app.title = 'Collection Analyzer'
-app.layout = layout_1  # page_layout
+app.layout = main_layout  # page_layout
 
 
 @app.callback(
@@ -67,26 +67,22 @@ def add_cards(traces, custom_data_columns, entity):
     card_data = get_metadata(entity, **conditions)
     cards = []
     for idx, row in card_data.iterrows():
-        card = BaseCard.from_row(row, style=CARD_STYLE)
+        card = ArtistCard.from_row(row)
         cards.append(card)
     return cards
 
 
 @app.callback(Output('release_card_col', 'children'),
-              Input('graph2', 'selectedData'),
+              Input('graph2', 'clickData'),
               State('graph2_custom_data', 'data'))
 def show_release_card(clickdata, customdata):
+    if not clickdata:
+        raise PreventUpdate
     # print(json.dumps(clickdata, indent=4, sort_keys=True))
     rid = get_factor('release_id', clickdata, customdata)['release_id'][0]
     release = get_entity(rid, 'release')
-    style = CARD_STYLE.copy()
-    style.update({
-        'min-height': '20vh',
-        'max-height': '20vh',
-        'min-width': '20vw',
-        'max-width': '20vw'
-    })
-    return BaseCard.from_discogs_item(release, style)
+
+    return AlbumCard.from_discogs_item(release)
 
 
 if __name__ == '__main__':

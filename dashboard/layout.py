@@ -3,8 +3,8 @@ from dash import html
 import dash_bootstrap_components as dbc
 from plotly.graph_objects import Layout, Figure
 from plotter import LAYOUT_STYLE
-from data_extractors import *
 from database_util import get_metadata
+from data_extractors import get_image_url
 
 
 ENTITY_OPTIONS = [
@@ -34,7 +34,7 @@ MAIN_STYLE = {
 TITLE_STYLE = {
     'color': '#EEEEEE',
     'background-color': '#252525',
-    'margin': '4px',
+    'margin': '8px',
     'width': '100%'
 }
 
@@ -53,7 +53,7 @@ GRAPH_TYPES = [
 ]
 
 
-CARD_STYLE = {
+ARTIST_CARD_STYLE = {
     'min-width': '14vw',
     'max-width': '14vw',
     'max-height': '10vh',
@@ -64,6 +64,16 @@ CARD_STYLE = {
     'border-radius': '10px'
 }
 
+ALBUM_CARD_STYLE = {
+    'min-width': '25vw',
+    'max-width': '25vw',
+    'min-height': '25vh',
+    'max-height': '25vh',
+    'padding': '10px',
+    'margin': '5px',
+    'background-color': '#333340',
+    'border-radius': '10px'
+}
 
 YAXIS_OPTIONS = [
     {'label': 'Lowest Price', 'value': 'lowest_price'},
@@ -131,58 +141,60 @@ class BaseCard(dbc.Card):
     """
     Class for artist/label/album cards
     """
-    def __init__(self, title, image, text, id_field, id_value, style):
+    def __init__(self, title, image, id_field, id_value, style, *args, **kwargs):
+        """
+        Instantiate a Card that is a subclass of a dash-bootstrap-components Card
+        :param title: card title
+        :param image: card image url
+        :param id_field: name of the id field such as release_id, artist_id, label_id
+        :param id_value: id value of the artist/label/release that this card represents
+        :param style: dict of css styles
+        """
         self._title = title
         self._image = image
-        self._text = text
         self._id_field = id_field
         self._id_value = id_value
         self._object_id = {'field': self._id_field, 'value': self._id_value}
         dbc.Card.__init__(self, id=self.generate_id('card'), style=style)
+
+    def generate_id(self, object_type):
+        """
+        generate a component id for a child component of this card
+        :param object_type: type of child component (button, image, etc...)
+        :return: dict
+        """
+        _output = {'object': object_type}
+        _output.update(self._object_id)
+        return _output
+
+
+class ArtistCard(BaseCard):
+    def __init__(self, title, image, id_field, id_value, style):
+        """
+        Instantiate a Card that is a subclass of a dash-bootstrap-components Card
+        :param title: card title
+        :param image: card image url
+        :param id_field: name of the id field such as release_id, artist_id, label_id
+        :param id_value: id value of the artist/label/release that this card represents
+        :param style: dict of css styles
+        """
+        BaseCard.__init__(self, title, image, id_field, id_value, style)
         self.children = []
         self.generate_components()
 
     @classmethod
-    def from_row(cls, row, style):
-        try:
-            title = row['name']
-        except:
-            title = row['title']
+    def from_row(cls, row):
+        """
+        Instantiate this class using a row from a database table
+        :param row: row of a db table representing an artist, release, or label
+        """
         return cls(
-            title=title,
+            title=row['name'],
             image=row['image'],
-            text='',
             id_field=row.index[0],
             id_value=row.values[0],
-            style=style
+            style=ARTIST_CARD_STYLE
         )
-
-    @classmethod
-    def from_discogs_item(cls, item, style):
-        if isinstance(item, discogs_client.Artist):
-            id_field = 'artist_id'
-            title = item.name
-        elif isinstance(item, discogs_client.Label):
-            id_field = 'label_id'
-            title = item.name
-        elif isinstance(item, discogs_client.Release):
-            id_field = 'release_id'
-            title = item.title
-        else:
-            raise ValueError(f'unknown type of {item}: {type(item)}')
-        return cls(
-            title=title,
-            image=get_image_url(item),
-            text='',
-            id_field=id_field,
-            id_value=item.id,
-            style=style
-        )
-
-    def generate_id(self, object_type):
-        _output = {'object': object_type}
-        _output.update(self._object_id)
-        return _output
 
     def generate_components(self):
         """
@@ -203,7 +215,67 @@ class BaseCard(dbc.Card):
                     ])
                 ])
             ]),
+        ]
 
+
+class AlbumCard(BaseCard):
+    def __init__(self, title, image, id_field, id_value, style):
+        """
+        Instantiate a Card that is a subclass of a dash-bootstrap-components Card
+        :param title: card title
+        :param image: card image url
+        :param id_field: name of the id field such as release_id, artist_id, label_id
+        :param id_value: id value of the artist/label/release that this card represents
+        :param style: dict of css styles
+        """
+        BaseCard.__init__(self, title, image, id_field, id_value, style)
+        self.children = []
+        self.generate_components()
+
+    @classmethod
+    def from_row(cls, row):
+        """
+        Instantiate this class using a row from a database table
+        :param row: row of a db table representing an artist, release, or label
+        """
+        return cls(
+            title=row['title'],
+            image=row['image'],
+            id_field=row.index[0],
+            id_value=row.values[0],
+            style=ALBUM_CARD_STYLE
+        )
+
+    @classmethod
+    def from_discogs_item(cls, release):
+        return cls(
+            title=release.title,
+            image=get_image_url(release),
+            id_field='release_id',
+            id_value=release.id,
+            style=ALBUM_CARD_STYLE
+        )
+
+    def generate_components(self):
+        self.children = [
+            dbc.Row([
+                dbc.Col([
+                    dbc.CardImg(src=self._image, id=self.generate_id('image')),
+                    dcc.Store(id=self.generate_id('card_store'), data=self._object_id),
+                ], width=4),
+                dbc.Col([
+                    dbc.CardBody([
+                        html.H4(
+                            self._title,
+                            style={'color': '#FFF', 'margin': '5px'}),
+                        dcc.Link(
+                            'View Discogs Marketplace',
+                            href=f'https://www.discogs.com/sell/release/{self._id_value}',
+                            target='_blank'
+                        )
+                    ])
+                ])
+            ]),
         ]
 
 # -----------------------------------------------------------------------------
@@ -216,7 +288,7 @@ def artist_options():
     return [html.Option(value=a) for a in artists['name'].tolist()]
 
 
-layout_1 = dbc.Container([
+main_layout = dbc.Container([
     dbc.Row([
         dbc.Col([
             html.H1('Record Collection Analyzer', style=TITLE_STYLE),
@@ -243,7 +315,9 @@ layout_1 = dbc.Container([
                     {'label': 'Linear', 'value': 'linear'}
                 ]
             ),
-            GraphPlus(id='graph1', vh=45, vw=45, show_selection=False)
+            dbc.Spinner([
+                GraphPlus(id='graph1', vh=45, vw=45, show_selection=False)
+            ], type='grow', color='info', spinner_style={'width': '100px', 'height': '75px'})
         ], width='auto'),
         dbc.Col([
             dbc.Spinner([
