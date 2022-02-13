@@ -218,6 +218,11 @@ class ArtistCard(BaseCard):
         ]
 
 
+# --------------------------------------------------------------------------------------------
+# - Album Card -------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------
+
+
 class AlbumCard(BaseCard):
     def __init__(self, title, image, id_field, id_value, style):
         """
@@ -260,8 +265,7 @@ class AlbumCard(BaseCard):
         self.children = [
             dbc.Row([
                 dbc.Col([
-                    dbc.CardImg(src=self._image, id=self.generate_id('image')),
-                    dcc.Store(id=self.generate_id('card_store'), data=self._object_id),
+                    dbc.CardImg(src=self._image, id=self.generate_id('image'))
                 ], width=4),
                 dbc.Col([
                     dbc.CardBody([
