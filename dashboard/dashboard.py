@@ -80,9 +80,14 @@ def show_release_card(clickdata, customdata):
         raise PreventUpdate
     # print(json.dumps(clickdata, indent=4, sort_keys=True))
     rid = get_factor('release_id', clickdata, customdata)['release_id'][0]
-    release = get_entity(rid, 'release')
 
-    return AlbumCard.from_discogs_item(release)
+    # this uses the discogs API
+    # release = get_entity(rid, 'release')
+    # card = AlbumCard.from_discogs_item(release)
+
+    release_row = get_metadata('album', release_id=[rid]).iloc[0]
+    card = AlbumCard.from_row(release_row)
+    return card
 
 
 if __name__ == '__main__':

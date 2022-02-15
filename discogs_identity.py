@@ -17,3 +17,4 @@ me = d.identity()
 
 collection = me.collection_folders[0].releases
 wantlist = me.wantlist
+r1 = collection[12].release

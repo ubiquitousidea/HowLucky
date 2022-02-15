@@ -65,10 +65,10 @@ ARTIST_CARD_STYLE = {
 }
 
 ALBUM_CARD_STYLE = {
-    'min-width': '25vw',
-    'max-width': '25vw',
-    'min-height': '25vh',
-    'max-height': '25vh',
+    'min-width': '30vw',
+    'max-width': '30vw',
+    'min-height': '30vh',
+    'max-height': '30vh',
     'padding': '10px',
     'margin': '5px',
     'background-color': '#333340',
@@ -153,7 +153,7 @@ class BaseCard(dbc.Card):
         self._title = title
         self._image = image
         self._id_field = id_field
-        self._id_value = id_value
+        self._id_value = str(id_value)
         self._object_id = {'field': self._id_field, 'value': self._id_value}
         dbc.Card.__init__(self, id=self.generate_id('card'), style=style)
 
@@ -186,7 +186,7 @@ class ArtistCard(BaseCard):
     def from_row(cls, row):
         """
         Instantiate this class using a row from a database table
-        :param row: row of a db table representing an artist, release, or label
+        :param row: Series, row of a db table representing an artist, release, or label
         """
         return cls(
             title=row['name'],
@@ -241,7 +241,7 @@ class AlbumCard(BaseCard):
     def from_row(cls, row):
         """
         Instantiate this class using a row from a database table
-        :param row: row of a db table representing an artist, release, or label
+        :param row: Series, row of a db table representing an artist, release, or label
         """
         return cls(
             title=row['title'],
@@ -266,7 +266,7 @@ class AlbumCard(BaseCard):
             dbc.Row([
                 dbc.Col([
                     dbc.CardImg(src=self._image, id=self.generate_id('image'))
-                ], width=4),
+                ], width=6),
                 dbc.Col([
                     dbc.CardBody([
                         html.H4(

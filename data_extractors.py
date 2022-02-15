@@ -52,6 +52,11 @@ def get_format(release):
 
 
 @just_try
+def get_release_text(release):
+    return release.formats[0]['text']
+
+
+@just_try
 def get_master_id(release):
     return release.master.id
 
