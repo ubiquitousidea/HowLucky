@@ -75,6 +75,15 @@ ALBUM_CARD_STYLE = {
     'border-radius': '10px'
 }
 
+CARD_GROUP_STYLE = {
+    'overflow': 'scroll',
+    'min-height': '50vh',
+    'max-height': '50vh',
+    'max-width': '45vw',
+    'min-width': '45vw'
+}
+
+
 YAXIS_OPTIONS = [
     {'label': 'Lowest Price', 'value': 'lowest_price'},
     {'label': 'Number for Sale', 'value': 'num_for_sale'}
@@ -109,6 +118,11 @@ class Options(dbc.Container):
         ]
 
 
+# --------------------------------------------------------------------------------------------
+# - Graph with entity and custom data name storage -------------------------------------------
+# --------------------------------------------------------------------------------------------
+
+
 class GraphPlus(dbc.Container):
     """
     Class to unify a graph and its associated customdata columns
@@ -135,6 +149,11 @@ class GraphPlus(dbc.Container):
         ]
         if self._show_selection:
             self.children.append(html.Pre(id=f'{self.base_id}_selection', style={'color': '#fff'}))
+
+
+# --------------------------------------------------------------------------------------------
+# - Base Card --------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------
 
 
 class BaseCard(dbc.Card):
@@ -166,6 +185,11 @@ class BaseCard(dbc.Card):
         _output = {'object': object_type}
         _output.update(self._object_id)
         return _output
+
+
+# --------------------------------------------------------------------------------------------
+# - Artist Card ------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------
 
 
 class ArtistCard(BaseCard):
@@ -243,6 +267,7 @@ class AlbumCard(BaseCard):
         Instantiate this class using a row from a database table
         :param row: Series, row of a db table representing an artist, release, or label
         """
+        # print(row)
         return cls(
             title=row['title'],
             image=row['image'],
@@ -321,19 +346,13 @@ main_layout = dbc.Container([
             ),
             dbc.Spinner([
                 GraphPlus(id='graph1', vh=45, vw=45, show_selection=False)
-            ], type='grow', color='info', spinner_style={'width': '100px', 'height': '75px'})
+            ], type='grow', color='warning', spinner_style={'width': '10rem', 'height': '10rem'})
         ], width='auto'),
         dbc.Col([
             dbc.Spinner([
                 dbc.CardGroup(
                     id='card_container',
-                    style={
-                        'overflow': 'scroll',
-                        'min-height': '50vh',
-                        'max-height': '50vh',
-                        'max-width': '45vw',
-                        'min-width': '45vw'
-                    }
+                    style=CARD_GROUP_STYLE
                 )
             ], color='info', type='grow', spinner_style={'height': '5rem', 'width': '5rem'})
         ])

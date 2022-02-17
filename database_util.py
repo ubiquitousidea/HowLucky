@@ -88,5 +88,5 @@ def get_metadata(entity, db=DB_CHOICE, **conditions):
     elif entity == 'album':
         output = _db.read_rows(RELEASE_TABLE, **conditions)
     else:
-        raise TypeError(f'bad entity {entity}')
+        output = _db.read_rows(entity, **conditions)
     return output

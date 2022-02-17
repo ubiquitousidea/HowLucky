@@ -3,14 +3,12 @@ create a dashboard to view and analyze the collected data
 """
 
 import dash
-import json
 from dash.dependencies import Input, Output, State, ALL
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 import webbrowser
 from plotter_util import get_factor, get_buttons_clicked
 from database_util import get_metadata
-from discogs_search import get_entity
 from layout import main_layout, ENTITY_MAP, ArtistCard, AlbumCard
 from plotter import (
     make_artist_plot,
@@ -67,8 +65,7 @@ def add_cards(traces, custom_data_columns, entity):
     card_data = get_metadata(entity, **conditions)
     cards = []
     for idx, row in card_data.iterrows():
-        card = ArtistCard.from_row(row)
-        cards.append(card)
+        cards.append(ArtistCard.from_row(row))
     return cards
 
 
@@ -76,18 +73,19 @@ def add_cards(traces, custom_data_columns, entity):
               Input('graph2', 'clickData'),
               State('graph2_custom_data', 'data'))
 def show_release_card(clickdata, customdata):
+    """
+    Create album card when user clicks a point on graph2
+    :param clickdata: clickData property of graph 2
+    :param customdata: list of column names stored in custom data of graph 2 points
+    :return: list of 1 album card
+    """
     if not clickdata:
         raise PreventUpdate
-    # print(json.dumps(clickdata, indent=4, sort_keys=True))
-    rid = get_factor('release_id', clickdata, customdata)['release_id'][0]
-
-    # this uses the discogs API
-    # release = get_entity(rid, 'release')
-    # card = AlbumCard.from_discogs_item(release)
-
-    release_row = get_metadata('album', release_id=[rid]).iloc[0]
-    card = AlbumCard.from_row(release_row)
-    return card
+    conditions = get_factor('release_id', clickdata, customdata)
+    cards = []
+    for idx, row in get_metadata('releases', **conditions).iterrows():
+        cards.append(AlbumCard.from_row(row))
+    return cards
 
 
 if __name__ == '__main__':
