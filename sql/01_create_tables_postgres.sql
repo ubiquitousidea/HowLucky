@@ -187,14 +187,15 @@ CREATE OR REPLACE VIEW public.last_price
     artists.name AS artist,
     labels.name AS label,
     releases.catno,
-    releases.year
+    releases.year,
+    releases.image
    FROM marketplace
      JOIN releases ON releases.release_id = marketplace.release_id
      JOIN artist_release ON artist_release.release_id = marketplace.release_id
      JOIN artists ON artists.artist_id = artist_release.artist_id
      JOIN label_release ON label_release.release_id = marketplace.release_id
      JOIN labels ON labels.label_id = label_release.label_id
-  ORDER BY marketplace.release_id, marketplace."when" DESC;
+  ORDER BY marketplace.release_id, marketplace."when" DESC, artist_release.artist_rank DESC, label_release.label_rank DESC;
 
 ALTER TABLE public.last_price
     OWNER TO dsnyder;

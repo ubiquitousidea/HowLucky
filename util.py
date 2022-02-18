@@ -75,7 +75,7 @@ def sleep_random(quiet=False):
     :param quiet: if False, print the sleep time before sleeping
     :return: None
     """
-    n = exponential(2, 1)[0]
+    n = 1 + exponential(2, 1)[0]
     if not quiet:
         print(f'sleeping {round(n, 2)} seconds')
     time.sleep(n)

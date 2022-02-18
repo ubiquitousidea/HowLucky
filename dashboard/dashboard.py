@@ -83,7 +83,7 @@ def show_release_card(clickdata, customdata):
         raise PreventUpdate
     conditions = get_factor('release_id', clickdata, customdata)
     cards = []
-    for idx, row in get_metadata('releases', **conditions).iterrows():
+    for idx, row in get_metadata('last_price', **conditions).iterrows():
         cards.append(AlbumCard.from_row(row))
     return cards
 
