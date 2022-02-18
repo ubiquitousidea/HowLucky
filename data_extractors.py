@@ -115,7 +115,7 @@ def prepare_label_data(release):
     """
     prepare the label information and release-label links
     :param release: Release object
-    :return: dict of release_id/label_id pairs, dict of labels
+    :return: dataframe, dataframe
     """
     rid = release.id
     n_labels = len(release.labels)
@@ -125,8 +125,10 @@ def prepare_label_data(release):
         'image': get_image_url(label)
     } for label in release.labels]
     label_release = [{
-        'release_id': rid, 'label_id': label['label_id']
-    } for label in labels]
+        'release_id': rid,
+        'label_id': label['label_id'],
+        'label_rank': idx
+    } for idx, label in enumerate(labels)]
     return (
         pd.DataFrame(label_release, index=range(n_labels)),
         pd.DataFrame(labels, index=range(n_labels))
@@ -134,6 +136,11 @@ def prepare_label_data(release):
 
 
 def prepare_artist_data(release):
+    """
+    prepare the artist data and release/artist link data
+    :param release: Release object
+    :return: dataframe, dataframe
+    """
     rid = release.id
     artists = release.artists
     n_artists = len(artists)
@@ -143,8 +150,10 @@ def prepare_artist_data(release):
         'image': get_image_url(artist)
     } for artist in artists]
     artist_release = [{
-        'artist_id': artist['artist_id'], 'release_id': rid
-    } for artist in artists]
+        'release_id': rid,
+        'artist_id': artist['artist_id'],
+        'artist_rank': idx
+    } for idx, artist in enumerate(artists)]
     return (
         pd.DataFrame(artist_release, index=range(n_artists)),
         pd.DataFrame(artists, index=range(n_artists))

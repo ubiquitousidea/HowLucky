@@ -84,6 +84,7 @@ CREATE TABLE IF NOT EXISTS public.label_release
 (
     release_id bigint NOT NULL,
     label_id bigint NOT NULL,
+    label_rank bigint,
     CONSTRAINT label_release_pkey PRIMARY KEY (release_id, label_id)
 )
 
@@ -125,6 +126,7 @@ CREATE TABLE IF NOT EXISTS public.artist_release
 (
     release_id bigint NOT NULL,
     artist_id bigint NOT NULL,
+    artist_rank bigint,
     CONSTRAINT artist_release_pkey PRIMARY KEY (release_id, artist_id)
 )
 
@@ -164,7 +166,7 @@ CREATE OR REPLACE VIEW public.prices
      JOIN artists ON artists.artist_id = artist_release.artist_id
      JOIN labels ON label_release.label_id = labels.label_id
   WHERE marketplace."when" IS NOT NULL AND marketplace.lowest_price IS NOT NULL
-  ORDER BY artists.name, releases.title, marketplace."when";
+  ORDER BY artists.name, releases.release_id, marketplace."when";
 
 ALTER TABLE public.prices
     OWNER TO dsnyder;
@@ -180,8 +182,18 @@ CREATE OR REPLACE VIEW public.last_price
  SELECT DISTINCT ON (marketplace.release_id) marketplace.release_id,
     marketplace.lowest_price,
     marketplace.num_for_sale,
-    marketplace."when"
+    marketplace."when",
+    releases.title,
+    artists.name AS artist,
+    labels.name AS label,
+    releases.catno,
+    releases.year
    FROM marketplace
+     JOIN releases ON releases.release_id = marketplace.release_id
+     JOIN artist_release ON artist_release.release_id = marketplace.release_id
+     JOIN artists ON artists.artist_id = artist_release.artist_id
+     JOIN label_release ON label_release.release_id = marketplace.release_id
+     JOIN labels ON labels.label_id = label_release.label_id
   ORDER BY marketplace.release_id, marketplace."when" DESC;
 
 ALTER TABLE public.last_price

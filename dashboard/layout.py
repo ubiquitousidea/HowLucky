@@ -267,7 +267,7 @@ class AlbumCard(BaseCard):
         Instantiate this class using a row from a database table
         :param row: Series, row of a db table representing an artist, release, or label
         """
-        # print(row)
+        print(row)
         return cls(
             title=row['title'],
             image=row['image'],
@@ -354,7 +354,7 @@ main_layout = dbc.Container([
                     id='card_container',
                     style=CARD_GROUP_STYLE
                 )
-            ], color='info', type='grow', spinner_style={'height': '5rem', 'width': '5rem'})
+            ], color='warning', type='grow', spinner_style={'height': '5rem', 'width': '5rem'})
         ])
     ]),
     dbc.Row([
