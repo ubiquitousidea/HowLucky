@@ -232,7 +232,7 @@ class ArtistCard(BaseCard):
                 ], width=4),
                 dbc.Col([
                     dbc.CardBody([
-                        html.H4(
+                        html.H5(
                             self._title,
                             style={'color': '#FFF', 'margin': '5px'}),
                         dbc.Button('View Albums', id=self.generate_id('card_button'))
@@ -248,7 +248,7 @@ class ArtistCard(BaseCard):
 
 
 class AlbumCard(BaseCard):
-    def __init__(self, title, image, id_field, id_value, style):
+    def __init__(self, title, image, catno, artist, label, year, country, id_field, id_value, style):
         """
         Instantiate a Card that is a subclass of a dash-bootstrap-components Card
         :param title: card title
@@ -258,6 +258,11 @@ class AlbumCard(BaseCard):
         :param style: dict of css styles
         """
         BaseCard.__init__(self, title, image, id_field, id_value, style)
+        self._catno = catno
+        self._artist = artist
+        self._label = label
+        self._year = year
+        self._country = country
         self.children = []
         self.generate_components()
 
@@ -267,24 +272,50 @@ class AlbumCard(BaseCard):
         Instantiate this class using a row from a database table
         :param row: Series, row of a db table representing an artist, release, or label
         """
-        print(row)
+        # print(row)
         return cls(
             title=row['title'],
             image=row['image'],
+            catno=row['catno'],
+            year=row['year'],
+            artist=row['artist'],
+            label=row['label'],
+            country=row['country'],
             id_field=row.index[0],
             id_value=row.values[0],
             style=ALBUM_CARD_STYLE
         )
 
-    @classmethod
-    def from_discogs_item(cls, release):
-        return cls(
-            title=release.title,
-            image=get_image_url(release),
-            id_field='release_id',
-            id_value=release.id,
-            style=ALBUM_CARD_STYLE
-        )
+    # @classmethod
+    # def from_discogs_item(cls, release):
+    #     return cls(
+    #         title=release.title,
+    #         image=get_image_url(release),
+    #         id_field='release_id',
+    #         id_value=release.id,
+    #         style=ALBUM_CARD_STYLE
+    #     )
+
+    @property
+    def title(self):
+        output = html.Div([
+            html.H5(
+                f'{self._title} ({self._catno})',
+                style={'color': '#FFF', 'margin': '5px'}),
+            html.P(
+                f'Artist: {self._artist}',
+                style={'color': '#FFF', 'margin': '5px'}
+            ),
+            html.P(
+                f'{self._label} ({self._country} {self._year})',
+                style={'color': '#FFF', 'margin': '5px'}
+            ),
+        ], style={'margin': '0px', 'padding': '0px'})
+        return output
+
+    @property
+    def info(self):
+        return
 
     def generate_components(self):
         self.children = [
@@ -294,9 +325,7 @@ class AlbumCard(BaseCard):
                 ], width=6),
                 dbc.Col([
                     dbc.CardBody([
-                        html.H4(
-                            self._title,
-                            style={'color': '#FFF', 'margin': '5px'}),
+                        self.title,
                         dcc.Link(
                             'View Discogs Marketplace',
                             href=f'https://www.discogs.com/sell/release/{self._id_value}',

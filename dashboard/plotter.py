@@ -213,7 +213,6 @@ def make_timeseries_plot(color_var, y_var='lowest_price', **conditions):
             '<b>Title</b>: %{customdata[1]} (%{customdata[0]})<br>'
             '<b>Artist</b>: %{customdata[2]}<br>'
             '<b>Label</b>: %{customdata[8]} (%{customdata[10]} %{customdata[5]})<br>'
-            # 'Release ID: %{customdata[7]}<br>'
             'Date: %{x}<br>'
             'Lowest Price: %{customdata[4]:$.2f}<br>'
             'Number for Sale: %{customdata[3]}'
