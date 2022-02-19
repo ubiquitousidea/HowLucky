@@ -1,10 +1,10 @@
 from dash import dcc
 from dash import html
 import dash_bootstrap_components as dbc
+import dash_cytoscape as cyto
 from plotly.graph_objects import Layout, Figure
 from plotter import LAYOUT_STYLE
 from database_util import get_metadata
-from data_extractors import get_image_url
 
 
 ENTITY_OPTIONS = [
@@ -46,12 +46,15 @@ MEASURE_OPTIONS = [
     {'label': 'Max', 'value': 'max'},
 ]
 
+LOG_LINEAR_OPTIONS = [
+    {'label': 'Log', 'value': 'log'},
+    {'label': 'Linear', 'value': 'linear'}
+]
 
 GRAPH_TYPES = [
     {'label': 'Time Series', 'value': 'timeseries'},
     {'label': 'Scatter Plot', 'value': 'scatter'}
 ]
-
 
 ARTIST_CARD_STYLE = {
     'min-width': '14vw',
@@ -91,7 +94,7 @@ YAXIS_OPTIONS = [
 
 
 RADIO_STYLE_ARGS = dict(
-    style={'margin': '2px'},
+    style={'margin': '2px', 'text-align': 'left'},
     labelStyle={'color': '#fff', 'margin': '5px'},
     inputStyle={'margin': '5px'}
 )
@@ -104,7 +107,7 @@ class Options(dbc.Container):
         self.children = [
             dbc.Row([
                 dbc.Col([
-                    html.H4(title, style={'color': '#fff'})
+                    html.H4(title, style={'color': '#fff', 'text-align': 'left'})
                 ], width=4),
                 dbc.Col([
                     dcc.RadioItems(
@@ -368,10 +371,12 @@ main_layout = dbc.Container([
             Options(
                 id='axis_type',
                 title='Axis Type',
-                options=[
-                    {'label': 'Log', 'value': 'log'},
-                    {'label': 'Linear', 'value': 'linear'}
-                ]
+                options=LOG_LINEAR_OPTIONS
+            ),
+            Options(
+                id='measure',
+                title='Measure Function',
+                options=MEASURE_OPTIONS
             ),
             dbc.Spinner([
                 GraphPlus(id='graph1', vh=45, vw=45, show_selection=False)
@@ -389,10 +394,6 @@ main_layout = dbc.Container([
     dbc.Row([
         dbc.Col([
             Options(id='graph2_options', title='Measure', options=YAXIS_OPTIONS),
-        ], width='auto')
-    ]),
-    dbc.Row([
-        dbc.Col([
             GraphPlus(id='graph2', vh=45, vw=60, show_selection=False, fluid=True)
         ]),
         dbc.Col(id='release_card_col')
