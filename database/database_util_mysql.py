@@ -1,4 +1,4 @@
-from database_classes import BaseDB
+from database.database_classes import BaseDB
 import mysql.connector
 import pandas as pd
 

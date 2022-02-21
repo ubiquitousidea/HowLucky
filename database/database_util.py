@@ -1,7 +1,7 @@
 from sql.schema import *
-from data_extractors import *
-from database_util_mysql import DBMySQL
-from database_util_postgres import DBPostgreSQL
+from database.data_extractors import *
+from database.database_util_mysql import DBMySQL
+from database.database_util_postgres import DBPostgreSQL
 
 
 # -----------------------------------------------------------------------------

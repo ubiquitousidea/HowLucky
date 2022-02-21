@@ -1,5 +1,5 @@
 import numpy as np
-from database_util import get_db_object
+from database.database_util import get_db_object
 
 
 migration_control = dict(

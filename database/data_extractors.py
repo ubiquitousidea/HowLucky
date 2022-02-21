@@ -106,7 +106,8 @@ def prepare_release_data(release):
         'format': get_format(release),
         'catno': get_catno(release),
         'master_id': get_master_id(release),
-        'image': get_image_url(release)
+        'image': get_image_url(release),
+        'format_details': get_release_text(release)
     }
     return pd.DataFrame(output, index=[0])
 

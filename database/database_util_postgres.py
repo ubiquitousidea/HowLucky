@@ -3,7 +3,7 @@ import psycopg2
 from psycopg2.extensions import register_adapter, AsIs
 import pandas as pd
 from sql.schema import SCHEMA_NAME
-from database_classes import BaseDB
+from database.database_classes import BaseDB
 
 
 def adapt_numpy_float64(numpy_float64):
@@ -65,6 +65,28 @@ class DBPostgreSQL(BaseDB):
                     print({'query': query})
                     print({'values': row})
                     raise e
+        return None
+
+    def update_rows(self, df, index_col, tbl):
+        """
+        update values in rows
+        :param df: data frame of values to update
+        :param index_col: name of the primary key column to use in the where statement
+        :param tbl: table name
+        :return: None
+        """
+        df = df.set_index(index_col)
+        with psycopg2.connect(**self.credentials) as conn:
+            cur = conn.cursor()
+            col_names = df.columns.to_list()
+            print(col_names)
+            for idx, row in df.iterrows():
+                values = row.values
+                update_string = ','.join([f'{col_name} = %s' for col_name in col_names])
+                query = f'update {tbl} set {update_string} where {index_col} = {idx}'
+                print(query)
+                print(values)
+                cur.execute(query, values)
         return None
 
     def read_rows(self, tbl, **conditions):

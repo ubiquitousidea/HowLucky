@@ -1,10 +1,9 @@
 from dash import dcc
 from dash import html
 import dash_bootstrap_components as dbc
-import dash_cytoscape as cyto
 from plotly.graph_objects import Layout, Figure
 from plotter import LAYOUT_STYLE
-from database_util import get_metadata
+from database.database_util import get_metadata
 
 
 ENTITY_OPTIONS = [
