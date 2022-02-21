@@ -250,7 +250,7 @@ class ArtistCard(BaseCard):
 
 
 class AlbumCard(BaseCard):
-    def __init__(self, title, image, catno, artist, label, year, country, id_field, id_value, style):
+    def __init__(self, title, image, catno, artist, label, year, country, format, format_details, id_field, id_value, style):
         """
         Instantiate a Card that is a subclass of a dash-bootstrap-components Card
         :param title: card title
@@ -265,6 +265,8 @@ class AlbumCard(BaseCard):
         self._label = label
         self._year = year
         self._country = country
+        self._format = format
+        self._format_details = format_details
         self.children = []
         self.generate_components()
 
@@ -283,20 +285,12 @@ class AlbumCard(BaseCard):
             artist=row['artist'],
             label=row['label'],
             country=row['country'],
+            format=row['format'],
+            format_details=row['format_details'],
             id_field=row.index[0],
             id_value=row.values[0],
             style=ALBUM_CARD_STYLE
         )
-
-    # @classmethod
-    # def from_discogs_item(cls, release):
-    #     return cls(
-    #         title=release.title,
-    #         image=get_image_url(release),
-    #         id_field='release_id',
-    #         id_value=release.id,
-    #         style=ALBUM_CARD_STYLE
-    #     )
 
     @property
     def title(self):
@@ -305,7 +299,11 @@ class AlbumCard(BaseCard):
                 f'{self._title} ({self._catno})',
                 style={'color': '#FFF', 'margin': '5px'}),
             html.P(
-                f'Artist: {self._artist}',
+                f'{self._format}, {self._format_details}',
+                style={'color':'#FFF', 'margin': '5px'}
+            ),
+            html.P(
+                f'by {self._artist}',
                 style={'color': '#FFF', 'margin': '5px'}
             ),
             html.P(
@@ -315,16 +313,12 @@ class AlbumCard(BaseCard):
         ], style={'margin': '0px', 'padding': '0px'})
         return output
 
-    @property
-    def info(self):
-        return
-
     def generate_components(self):
         self.children = [
             dbc.Row([
                 dbc.Col([
                     dbc.CardImg(src=self._image, id=self.generate_id('image'))
-                ], width=6),
+                ], width=5),
                 dbc.Col([
                     dbc.CardBody([
                         self.title,
@@ -375,7 +369,8 @@ main_layout = dbc.Container([
             Options(
                 id='measure',
                 title='Measure Function',
-                options=MEASURE_OPTIONS
+                options=MEASURE_OPTIONS,
+                default_option=1
             ),
             dbc.Spinner([
                 GraphPlus(id='graph1', vh=45, vw=45, show_selection=False)

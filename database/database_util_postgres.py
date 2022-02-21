@@ -79,13 +79,10 @@ class DBPostgreSQL(BaseDB):
         with psycopg2.connect(**self.credentials) as conn:
             cur = conn.cursor()
             col_names = df.columns.to_list()
-            print(col_names)
             for idx, row in df.iterrows():
                 values = row.values
                 update_string = ','.join([f'{col_name} = %s' for col_name in col_names])
                 query = f'update {tbl} set {update_string} where {index_col} = {idx}'
-                print(query)
-                print(values)
                 cur.execute(query, values)
         return None
 

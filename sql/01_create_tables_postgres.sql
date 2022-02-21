@@ -189,7 +189,9 @@ CREATE OR REPLACE VIEW public.last_price
     releases.catno,
     releases.year,
     releases.image,
-    releases.country
+    releases.country,
+    releases.format,
+    releases.format_details
    FROM marketplace
      JOIN releases ON releases.release_id = marketplace.release_id
      JOIN artist_release ON artist_release.release_id = marketplace.release_id

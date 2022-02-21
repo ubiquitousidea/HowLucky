@@ -23,5 +23,3 @@ for idx, item in get_metadata(TBL).iterrows():
     ], index=[0])
     db.update_rows(df, INDEX, TBL)
     sleep_random()
-    if idx > 2:
-        break
