@@ -242,3 +242,19 @@ CREATE OR REPLACE VIEW public.artist_by_release
 
 ALTER TABLE public.artist_by_release
     OWNER TO dsnyder;
+
+
+-- View: public.unique_releases
+
+-- DROP VIEW public.unique_releases;
+
+CREATE OR REPLACE VIEW public.unique_releases
+ AS
+ SELECT marketplace.release_id,
+    count(*) AS count
+   FROM marketplace
+  GROUP BY marketplace.release_id;
+
+ALTER TABLE public.unique_releases
+    OWNER TO dsnyder;
+
