@@ -51,9 +51,10 @@ def update_graph2(card_clicks, y_var, card_data):
 
 @app.callback(Output('card_container', 'children'),
               Input('graph1', 'selectedData'),
+              Input('search_box', 'value'),
               State('graph1_custom_data', 'data'),
               State('graph1_entity', 'data'))
-def add_cards(traces, custom_data_columns, entity):
+def add_cards(traces, search, custom_data_columns, entity):
     """
     generate dash bootstrap cards to represent a selection of point
     :param traces: selected points
@@ -61,15 +62,17 @@ def add_cards(traces, custom_data_columns, entity):
     :param entity: name of the entity plotted on scatter plot
     :return: list of Cards
     """
-    if traces is None or len(traces) == 0:
-        return []
-    entity = entity[0]
-    col_name, color_var = ENTITY_MAP.get(entity)
-    conditions = get_factor(col_name, traces, custom_data_columns)
-    card_data = get_metadata(entity, **conditions)
     cards = []
-    for idx, row in card_data.iterrows():
-        cards.append(ArtistCard.from_row(row))
+    if traces:
+        entity = entity[0]
+        col_name, color_var = ENTITY_MAP.get(entity)
+        conditions = get_factor(col_name, traces, custom_data_columns)
+        card_data = get_metadata(entity, **conditions)
+        for idx, row in card_data.iterrows():
+            cards.append(ArtistCard.from_row(row))
+    if search:
+        card_data = get_metadata('artist', name=[search])
+        cards.append(ArtistCard.from_row(card_data.iloc[0]))
     return cards
 
 

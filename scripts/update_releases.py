@@ -2,7 +2,8 @@
 update the releases table
 """
 
-from database.database_util import get_metadata, get_db_object
+import argparse
+from database.database_util import get_metadata, get_db_object, store_release_metadata
 from discogs_search import get_entity
 from sql.schema import DB_CHOICE
 from database.data_extractors import get_release_text
@@ -10,16 +11,42 @@ from util import sleep_random
 from pandas import DataFrame
 
 
+parser = argparse.ArgumentParser()
+
+parser.add_argument(
+    '--format_details',
+    help='update release format details for releases already in table',
+    type=int, default=0
+)
+parser.add_argument(
+    '--find_missing',
+    help='find missing releases present in marketplace data but not release table',
+    type=int, default=0,
+)
+args = parser.parse_args()
+
 db = get_db_object(DB_CHOICE)
 
-TBL = 'releases'
-INDEX = 'release_id'
+if args.format_details:
+    TBL = 'releases'
+    INDEX = 'release_id'
+    for idx, item in get_metadata(TBL).iterrows():
+        release = get_entity(item[INDEX], 'release')
+        df = DataFrame([
+            {INDEX: item[INDEX],
+             'format_details': get_release_text(release)}
+        ], index=[0])
+        db.update_rows(df, INDEX, TBL)
+        sleep_random()
+elif args.find_missing:
+    r = db.read_rows('releases')
+    m = db.read_rows('unique_releases')
+    missing_releases = set(m['release_id']) - set(r['release_id'])
+    for release_id in sorted(list(missing_releases)):
+        release = get_entity(release_id, 'release')
+        store_release_metadata(db, release)
+else:
+    pass
 
-for idx, item in get_metadata(TBL).iterrows():
-    release = get_entity(item[INDEX], 'release')
-    df = DataFrame([
-        {INDEX: item[INDEX],
-         'format_details': get_release_text(release)}
-    ], index=[0])
-    db.update_rows(df, INDEX, TBL)
-    sleep_random()
+
+

@@ -352,9 +352,10 @@ main_layout = dbc.Container([
         ], width='auto'),
         dbc.Col([
             dbc.Input(
-                id='search-box',
+                id='search_box',
                 list='artists',
                 type='text',
+                debounce=True,
                 style={'margin': '10px', 'width': '500px'}),
             html.Datalist(artist_options(), id='artists')
         ])
