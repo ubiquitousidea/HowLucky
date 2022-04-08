@@ -63,7 +63,7 @@ def add_cards(traces, search, custom_data_columns, entity):
     :return: list of Cards
     """
     cards = []
-    if traces:
+    if traces is not None and traces['points'].__len__() > 0:
         entity = entity[0]
         col_name, color_var = ENTITY_MAP.get(entity)
         conditions = get_factor(col_name, traces, custom_data_columns)

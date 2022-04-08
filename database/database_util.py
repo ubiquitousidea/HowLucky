@@ -70,7 +70,7 @@ def store_release_data(release, store_metadata=True, store_prices=True, db=DB_CH
             pass
     return None
 
-
+#
 # -----------------------------------------------------------------------------
 # - Database retrieval functions ----------------------------------------------
 # -----------------------------------------------------------------------------
