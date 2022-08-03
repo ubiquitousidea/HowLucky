@@ -45,7 +45,7 @@ elif args.find_missing:
     m = db.read_rows('unique_releases')
     missing_releases = set(m['release_id']) - set(r['release_id'])
     for release_id in sorted(list(missing_releases)):
-        release = get_entity(release_id, 'release')
+        release = get_entity(release_id, 'release_id')
         store_release_metadata(db, release)
         sleep_random()
 elif args.artist_url:
