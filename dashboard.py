@@ -7,10 +7,10 @@ from dash.dependencies import Input, Output, State, ALL
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 import webbrowser
-from plotter_util import get_factor, get_buttons_clicked
+from dashboard.plotter_util import get_factor, get_buttons_clicked
 from database.database_util import get_metadata
-from layout import main_layout, ENTITY_MAP, ArtistCard, AlbumCard
-from plotter import (
+from dashboard.layout import main_layout, ENTITY_MAP, ArtistCard, AlbumCard
+from dashboard.plotter import (
     make_artist_plot,
     make_timeseries_plot
 )
