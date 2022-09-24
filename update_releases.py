@@ -5,7 +5,7 @@ update the releases table
 import argparse
 from database.database_util import get_metadata, get_db_object, store_release_metadata
 from discogs_search import get_entity, get_attribute
-from update_field import update_field
+from scripts.update_field import update_field
 from sql.schema import DB_CHOICE
 from database.data_extractors import get_release_text, get_image_url
 from util import sleep_random
