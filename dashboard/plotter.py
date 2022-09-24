@@ -185,6 +185,11 @@ def make_timeseries_plot(color_var, y_var='lowest_price', **conditions):
     :return:
     """
     df = get_price_data(**conditions)
+    # TODO: add a time series resampler for groups by catalog number (catno)
+    # df = df.set_index('when').groupby([
+    #     'catno', 'title', 'artist', 'year', 'artist_id',
+    #     'release_id', 'label', 'label_id', 'country'
+    # ]).resample('1D').mean().reset_index()
     custom_data = [
         'catno', 'title', 'artist', 'num_for_sale', 'lowest_price', 'year',
         'artist_id', 'release_id', 'label', 'label_id', 'country']
