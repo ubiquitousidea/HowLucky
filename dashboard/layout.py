@@ -342,55 +342,91 @@ def artist_options():
     return [html.Option(value=a) for a in artists['name'].tolist()]
 
 
+# main_layout = dbc.Container([
+#     dbc.Row([
+#         dbc.Col([
+#             html.H1('Record Collection Analyzer', style=TITLE_STYLE),
+#         ], width='auto'),
+#         dbc.Col([
+#             dbc.Button('Analyze', id='analyze_button', style={'margin-top': '10px'})
+#         ], width='auto'),
+#         dbc.Col([
+#             dbc.Input(
+#                 id='search_box',
+#                 list='artists',
+#                 type='text',
+#                 debounce=True,
+#                 style={'margin': '10px', 'width': '500px'}),
+#             html.Datalist(artist_options(), id='artists')
+#         ])
+#     ]),
+#     dbc.Row([
+#         dbc.Col([
+#             Options(
+#                 id='axis_type',
+#                 title='Axis Type',
+#                 options=LOG_LINEAR_OPTIONS
+#             ),
+#             Options(
+#                 id='measure',
+#                 title='Measure Function',
+#                 options=MEASURE_OPTIONS,
+#                 default_option=1
+#             ),
+#             dbc.Spinner([
+#                 GraphPlus(id='graph1', vh=45, vw=45, show_selection=False)
+#             ], type='grow', color='warning', spinner_style={'width': '10rem', 'height': '10rem'})
+#         ], width='auto'),
+#         dbc.Col([
+#             dbc.Spinner([
+#                 dbc.CardGroup(
+#                     id='card_container',
+#                     style=CARD_GROUP_STYLE
+#                 )
+#             ], color='warning', type='grow', spinner_style={'height': '5rem', 'width': '5rem'})
+#         ])
+#     ]),
+#     dbc.Row([
+#         dbc.Col([
+#             Options(id='graph2_options', title='Measure', options=YAXIS_OPTIONS),
+#             GraphPlus(id='graph2', vh=45, vw=60, show_selection=False, fluid=True)
+#         ]),
+#         dbc.Col(id='release_card_col')
+#     ])
+# ], fluid=True, id='main_container', style=MAIN_STYLE)
+
 main_layout = dbc.Container([
     dbc.Row([
         dbc.Col([
-            html.H1('Record Collection Analyzer', style=TITLE_STYLE),
-        ], width='auto'),
-        dbc.Col([
-            dbc.Button('Analyze', id='analyze_button', style={'margin-top': '10px'})
-        ], width='auto'),
-        dbc.Col([
             dbc.Input(
-                id='search_box',
-                list='artists',
+                id='search_text',
                 type='text',
                 debounce=True,
-                style={'margin': '10px', 'width': '500px'}),
-            html.Datalist(artist_options(), id='artists')
-        ])
-    ]),
-    dbc.Row([
-        dbc.Col([
-            Options(
-                id='axis_type',
-                title='Axis Type',
-                options=LOG_LINEAR_OPTIONS
-            ),
-            Options(
-                id='measure',
-                title='Measure Function',
-                options=MEASURE_OPTIONS,
-                default_option=1
-            ),
-            dbc.Spinner([
-                GraphPlus(id='graph1', vh=45, vw=45, show_selection=False)
-            ], type='grow', color='warning', spinner_style={'width': '10rem', 'height': '10rem'})
-        ], width='auto'),
-        dbc.Col([
-            dbc.Spinner([
-                dbc.CardGroup(
-                    id='card_container',
-                    style=CARD_GROUP_STYLE
-                )
-            ], color='warning', type='grow', spinner_style={'height': '5rem', 'width': '5rem'})
-        ])
-    ]),
-    dbc.Row([
-        dbc.Col([
-            Options(id='graph2_options', title='Measure', options=YAXIS_OPTIONS),
-            GraphPlus(id='graph2', vh=45, vw=60, show_selection=False, fluid=True)
+                style={
+                    'margin': '10px',
+                    'width': '300px'
+                }
+            )
         ]),
-        dbc.Col(id='release_card_col')
+        dbc.Col([
+            dbc.Button([
+
+            ], id='search_button')
+        ])
+    ]),
+    dbc.Row([
+        dbc.Col([
+            dbc.Collapse([
+
+            ], id='collapse1')
+        ])
     ])
+
 ], fluid=True, id='main_container', style=MAIN_STYLE)
+
+
+
+
+
+
+
