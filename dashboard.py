@@ -125,4 +125,4 @@ def make_search(n, txt):
 if __name__ == '__main__':
     port = 8052
     webbrowser.open(f'http://127.0.0.1:{port}')
-    app.run_server(port=port, debug=False)
+    app.run_server(port=port, debug=True)

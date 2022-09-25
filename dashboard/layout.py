@@ -10,7 +10,8 @@ ENTITY_OPTIONS = [
     {'label': 'Country', 'value': 'country'},
     {'label': 'Label', 'value': 'label'},
     {'label': 'Artist', 'value': 'artist'},
-    {'label': 'Album', 'value': 'album'}
+    {'label': 'Album', 'value': 'album'},
+    {'label': 'Song', 'value': 'song'}
 ]
 
 
@@ -18,15 +19,17 @@ ENTITY_MAP = dict(
     album=['release_id', 'title'],
     artist=['artist_id', 'artist'],
     country=['country', 'country'],
-    label=['label_id', 'label']
+    label=['label_id', 'label'],
+    song=['song_id', 'title']  # TODO: make song a valid option
 )
 
 
 MAIN_STYLE = {
     'font-family': 'helvetica',
-    'background-color': '#222222',
+    'background-color': '#ABCABC',
     'min-height': '100vh',
-    'min-width': '100vw',
+    'min-width': '80vw',
+    'max-width': '80vw'
 }
 
 
@@ -107,7 +110,7 @@ class Options(dbc.Container):
             dbc.Row([
                 dbc.Col([
                     html.H4(title, style={'color': '#fff', 'text-align': 'left'})
-                ], width=4),
+                ],width=3),
                 dbc.Col([
                     dcc.RadioItems(
                         id=id,
@@ -116,7 +119,7 @@ class Options(dbc.Container):
                         **RADIO_STYLE_ARGS
                     )
                 ])
-            ], justify='start')
+            ], justify='center')
         ]
 
 
@@ -406,8 +409,18 @@ class SearchResult(dbc.Card):
 #     ])
 # ], fluid=True, id='main_container', style=MAIN_STYLE)
 
+
 main_layout = dbc.Container([
     html.H1('Collection Analyser 2.0.0', style={'color': 'white'}),
+    dbc.Row([
+        dbc.Col([
+            Options(
+                id='entity_options',
+                title='Entity',
+                options=ENTITY_OPTIONS
+            )
+        ])
+    ], justify='center'),
     dbc.Row([
         dbc.Col([
             dbc.Input(
@@ -421,7 +434,9 @@ main_layout = dbc.Container([
             )
         ]),
         dbc.Col([
-            dbc.Button([html.H5('Search')], id='search_button')
+            dbc.Button([
+                html.H5('Search')
+            ], color='secondary', id='search_button')
         ])
     ]),
     dbc.Row([
