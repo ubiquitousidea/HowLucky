@@ -342,6 +342,17 @@ def artist_options():
     return [html.Option(value=a) for a in artists['name'].tolist()]
 
 
+
+class SearchResult(dbc.Card):
+    def __init__(self, item):
+        """
+        represent a search result
+        :param item: discogs client object (
+        """
+    pass
+
+
+
 # main_layout = dbc.Container([
 #     dbc.Row([
 #         dbc.Col([
@@ -396,6 +407,7 @@ def artist_options():
 # ], fluid=True, id='main_container', style=MAIN_STYLE)
 
 main_layout = dbc.Container([
+    html.H1('Collection Analyser 2.0.0', style={'color': 'white'}),
     dbc.Row([
         dbc.Col([
             dbc.Input(
@@ -409,15 +421,13 @@ main_layout = dbc.Container([
             )
         ]),
         dbc.Col([
-            dbc.Button([
-
-            ], id='search_button')
+            dbc.Button([html.H5('Search')], id='search_button')
         ])
     ]),
     dbc.Row([
         dbc.Col([
             dbc.Collapse([
-
+                dbc.CardGroup(id='search_results')
             ], id='collapse1')
         ])
     ])

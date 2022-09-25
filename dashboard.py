@@ -9,7 +9,7 @@ import dash_bootstrap_components as dbc
 import webbrowser
 from dashboard.plotter_util import get_factor, get_buttons_clicked
 from database.database_util import get_metadata
-from dashboard.layout import main_layout, ENTITY_MAP, ArtistCard, AlbumCard
+from dashboard.layout import main_layout, ENTITY_MAP, ArtistCard, AlbumCard, SearchResult
 from discogs_identity import d as client
 from dashboard.plotter import (
     make_artist_plot,
@@ -105,6 +105,10 @@ app.layout = main_layout  # page_layout
 #     return cards
 
 
+
+
+
+
 @app.callback(
     Output('search_results', 'children'),
     Output('collapse1', 'is_open'),
@@ -114,6 +118,8 @@ app.layout = main_layout  # page_layout
 def make_search(n, txt):
     if not n:
         raise PreventUpdate
+    results = client.search(txt)
+    return [SearchResult(a) for a in results], True
 
 
 if __name__ == '__main__':
