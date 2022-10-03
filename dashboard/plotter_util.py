@@ -17,22 +17,38 @@ def get_factor(attribute, traces, custom_data_labels):
     return condition
 
 
-def get_buttons_clicked(entities, clicks):
-    """
-    return a field name : value condition dictionary from card info and card button clicks
-    :param entities: info stored in card store data attributes (could be artist ids, label ids)
-    :param clicks: number of time each button was pressed
-    :return: condition dictionary
-    """
+class ClickState(object):
+    def __init__(self, entities, clicks):
+        """
+        class to represent the state of buttons clicked in the search result array
+        :param entities: info stored in card store data attributes (could be artist ids, label ids)
+        :param clicks: number of time each button was pressed
+        """
+        self._clicks = clicks
+        self._entities = entities
 
-    output = pd.DataFrame(entities).assign(clicks=clicks)
-    output = output[output['clicks'].notna()]
-    output = output.assign(keep=lambda x: x.clicks % 2 == 1)
-    output = output[output['keep']]
-    try:
-        output = output.groupby('field').agg({'value': lambda x: list(x)}).reset_index().to_dict('records')
-        output = {item['field']: item['value'] for item in output}
-    except KeyError:
-        output = {}
+    def get_buttons_clicked(self):
+        """
+        determine which card buttons have been clicked an odd number of times
+        summarize which buttons were clicked by returning a dictionary similar to
+        {
+            'artist_id': [ids of the artists clicked an odd number of times]
+        }
+        :return: dictionary of list of ids values
+            conditions include artist_id=[...], album_id=[...], and others
+        """
 
-    return output
+        output = pd.DataFrame(self._entities).assign(clicks=self._clicks)
+        output = output[output['clicks'].notna()]
+        output = output.assign(keep=lambda x: x.clicks % 2 == 1)
+        output = output[output['keep']]
+        try:
+            output = output.groupby('field').agg({'value': lambda x: list(x)}).reset_index().to_dict('records')
+            output = {item['field']: item['value'] for item in output}
+        except KeyError:
+            output = {}
+
+        return output
+
+    def get_last_button_clicked(self, entities, clicks):
+        pass

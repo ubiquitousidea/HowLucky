@@ -7,12 +7,13 @@ from dash.dependencies import Input, Output, State, ALL
 from dash.exceptions import PreventUpdate
 import dash_bootstrap_components as dbc
 import webbrowser
-from dashboard.plotter_util import get_factor, get_buttons_clicked
+from dashboard.plotter_util import get_factor, ClickState
 from database.database_util import get_metadata
 from dashboard.layout import main_layout, ENTITY_MAP, ArtistCard, AlbumCard, SearchResult
 from discogs_identity import d as client
 from dashboard.plotter import (
     make_artist_plot,
+
     make_timeseries_plot
 )
 
@@ -38,25 +39,39 @@ app.layout = main_layout  # page_layout
 #         loglog=('log' in at))
 #
 #
-# @app.callback(Output('graph2', 'figure'),
-#               Output('graph2_custom_data', 'data'),
-#               Input({
-#                   'object': 'card_button',
-#                   'field': ALL,
-#                   'value': ALL}, 'n_clicks'),
-#               Input('graph2_options', 'value'),
-#               State({
-#                   'object': 'card_store',
-#                   'field': ALL,
-#                   'value': ALL}, 'data'),
-#               )
-# def update_graph2_and_card_colors(card_clicks, y_var, card_data):
-#     conditions = get_buttons_clicked(card_data, card_clicks)
-#     if not conditions:
-#         raise PreventUpdate
-#     time_series_figure, time_series_custom_data = make_timeseries_plot(
-#         color_var='title', y_var=y_var, **conditions)
-#     return time_series_figure, time_series_custom_data  # , card_styles
+@app.callback(Output('music_relationship_plot', 'figure'),
+              Output('music_relationship_plot_custom_data', 'data'),
+              Output('music_relationship_plot_entity', 'data'),
+              Input({
+                  'object': 'card_button',
+                  'field': ALL,
+                  'value': ALL}, 'n_clicks'),
+              Input('graph2_options', 'value'),
+              State({
+                  'object': 'card_store',
+                  'field': ALL,
+                  'value': ALL}, 'data'),
+              )
+def create_music_relationship_graph(card_clicks, y_var, card_data):
+    # conditions = get_buttons_clicked(card_data, card_clicks)
+    clickstate = ClickState(entities=card_data, clicks=card_clicks)
+    conditions = clickstate.get_last_button_clicked()
+    if not conditions:
+        raise PreventUpdate
+    # time_series_figure, time_series_custom_data = make_timeseries_plot(
+    #     color_var='title', y_var=y_var, **conditions)
+    # return time_series_figure, time_series_custom_data  # , card_styles
+    return make_artist_plot()
+
+# @app.callback(
+#     Output('music_relationship_plot', 'figure'),
+#     Input({'type': 'button', 'entity': ALL}, 'n_clicks')
+# )
+# def create_music_relationship_graph(n_):
+#     pass
+
+
+
 #
 #
 # @app.callback(Output('card_container', 'children'),
@@ -106,9 +121,6 @@ app.layout = main_layout  # page_layout
 
 
 
-
-
-
 @app.callback(
     Output('search_results', 'children'),
     Output('collapse1', 'is_open'),
@@ -123,6 +135,6 @@ def make_search(n, txt):
 
 
 if __name__ == '__main__':
-    port = 8052
+    port = 8053
     webbrowser.open(f'http://127.0.0.1:{port}')
-    app.run_server(port=port, debug=True)
+    app.run_server(port=port, debug=False)

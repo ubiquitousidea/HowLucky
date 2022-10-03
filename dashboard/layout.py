@@ -4,6 +4,7 @@ import dash_bootstrap_components as dbc
 from plotly.graph_objects import Layout, Figure
 from .plotter import LAYOUT_STYLE
 from database.database_util import get_metadata
+from palet.color_palets import onemorning
 
 
 ENTITY_OPTIONS = [
@@ -26,7 +27,7 @@ ENTITY_MAP = dict(
 
 MAIN_STYLE = {
     'font-family': 'helvetica',
-    'background-color': '#ABCABC',
+    'background-color': onemorning[4],
     'min-height': '100vh',
     'min-width': '80vw',
     'max-width': '80vw'
@@ -35,7 +36,7 @@ MAIN_STYLE = {
 
 TITLE_STYLE = {
     'color': '#EEEEEE',
-    'background-color': '#252525',
+    'background-color': onemorning[2],
     'margin': '8px',
     'width': '100%'
 }
@@ -65,7 +66,7 @@ ARTIST_CARD_STYLE = {
     'min-height': '10vh',
     'padding': '10px',
     'margin': '5px',
-    'background-color': '#333340',
+    'background-color': onemorning[1],
     'border-radius': '10px'
 }
 
@@ -76,7 +77,7 @@ ALBUM_CARD_STYLE = {
     'max-height': '30vh',
     'padding': '10px',
     'margin': '5px',
-    'background-color': '#333340',
+    'background-color': onemorning[1],
     'border-radius': '10px'
 }
 
@@ -146,7 +147,7 @@ class GraphPlus(dbc.Container):
         self.children = [
             dcc.Graph(
                 id=self.base_id,
-                style={'height': f'{self._vh}vh', 'width': f'{self._vw}vw'},
+                style={'height': f'{self._vh} vh', 'width': f'{self._vw} vw'},
                 figure=Figure(layout=Layout(**LAYOUT_STYLE))
             ),
             dcc.Store(id=f'{self.base_id}_custom_data'),
@@ -164,6 +165,13 @@ class GraphPlus(dbc.Container):
 class BaseCard(dbc.Card):
     """
     Class for artist/label/album cards
+
+    When instances of this card class are present in a layout
+    callback functions can be triggered by changes to any of
+    the cards in the layout. This allows for counting of button
+    clicks with a special processing function get_buttons_clicked
+    in plotter_util.py
+
     """
     def __init__(self, title, image, id_field, id_value, style, *args, **kwargs):
         """
@@ -409,7 +417,6 @@ class SearchResult(dbc.Card):
 #     ])
 # ], fluid=True, id='main_container', style=MAIN_STYLE)
 
-
 main_layout = dbc.Container([
     html.H1('Collection Analyser 2.0.0', style={'color': 'white'}),
     dbc.Row([
@@ -444,6 +451,15 @@ main_layout = dbc.Container([
             dbc.Collapse([
                 dbc.CardGroup(id='search_results')
             ], id='collapse1')
+        ])
+    ]),
+    dbc.Row([
+        dbc.Col([
+            GraphPlus(
+                id='music_relationship_plot',
+                vw=90,
+                show_selection=True
+            )
         ])
     ])
 

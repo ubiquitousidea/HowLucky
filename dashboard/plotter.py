@@ -1,5 +1,7 @@
+from plotly.graph_objects import Figure
 import plotly.express as px
 from database.database_util import get_price_data
+from datetime import datetime
 
 
 LAYOUT_STYLE = dict(
@@ -26,7 +28,18 @@ YAXIS_MONEY_FORMAT = dict(
 )
 
 
-def aggregate_prices(groupings, x_measure, y_measure, **conditions):
+def timeit(func):
+    def func_(*args, **kwargs):
+        t1 = datetime.now()
+        output = func(*args, **kwargs)
+        t2 = datetime.now()
+        print(f'Query took {t2 - t1}')
+        return output
+    return func_
+
+
+@timeit
+def aggregate_prices(groupings, x_measure, y_measure, central_id, **conditions):
     """
     Utility function to collect and aggregate the prices by the groupings specified
     :param groupings: names of the grouping columns
@@ -45,16 +58,26 @@ def aggregate_prices(groupings, x_measure, y_measure, **conditions):
         }).rename(columns={'title': 'count'}))
 
 
-def agg_plot(groupings, title, x_measure='median', y_measure='median', loglog=True, **conditions):
+def agg_plot(
+        groupings, title,
+        x_measure='median',
+        y_measure='median',
+        loglog=True,
+        central_id=None,
+        **conditions):
     """
-    group the price data and aggregate price and supply
+    aggregate a measure over entities (groups of records)
+    entities - label, artist, country, album, song
     :param groupings: list of names of categorical columns for grouping the marketplace data
     :param title: title for the plot figure
     :param x_measure: function to aggregate num_for_sale over groups
     :param y_measure: function to aggregate lowest_price over groups
+    :param loglog: bool, use log axes for both x and y?
+    :param central_id: integer, center the plot view on this entity
     :return: Figure
     """
-    df = aggregate_prices(groupings, x_measure, y_measure, **conditions)
+    df = aggregate_prices(groupings, x_measure, y_measure, central_id, **conditions)
+    # - dots of size n_unique(album title) --
     fig = px.scatter(
         df.reset_index(),
         x='num_for_sale',
@@ -71,6 +94,20 @@ def agg_plot(groupings, title, x_measure='median', y_measure='median', loglog=Tr
         },
         title=title
     )
+    # - album covers instead of points --
+    # fig = Figure()
+    # if image_path is not None:
+    #     fig = fig.add_layout_image(
+    #         x=x,
+    #         y=y,
+    #         source=url,
+    #         xref="x",
+    #         yref="y",
+    #         sizex=2,
+    #         sizey=2,
+    #         xanchor="center",
+    #         yanchor="middle",
+    #     )
     return fig
 
 
@@ -125,7 +162,7 @@ def make_label_plot(x_measure='median', y_measure='median'):
     return fig, groupings, ['label']
 
 
-def make_artist_plot(x_measure='median', y_measure='median', loglog=True):
+def make_artist_plot(central_artist_id=None, x_measure='median', y_measure='median', loglog=True):
     """
     produce a plot representing each artist in the data
     :return: Figure
@@ -136,7 +173,8 @@ def make_artist_plot(x_measure='median', y_measure='median', loglog=True):
         title='Artists: Price vs. Supply',
         x_measure=x_measure,
         y_measure=y_measure,
-        loglog=loglog
+        loglog=loglog,
+        central_id=central_artist_id
     )
     fig.update_layout(**LAYOUT_STYLE)
     fig.update_layout(**YAXIS_MONEY_FORMAT)
