@@ -27,7 +27,7 @@ ENTITY_MAP = dict(
 
 MAIN_STYLE = {
     'font-family': 'helvetica',
-    'background-color': onemorning[4],
+    'background-color': "#" + onemorning[1],
     'min-height': '100vh',
     'min-width': '80vw',
     'max-width': '80vw'
@@ -36,7 +36,7 @@ MAIN_STYLE = {
 
 TITLE_STYLE = {
     'color': '#EEEEEE',
-    'background-color': onemorning[2],
+    'background-color': "#" + onemorning[3],
     'margin': '8px',
     'width': '100%'
 }
@@ -66,7 +66,7 @@ ARTIST_CARD_STYLE = {
     'min-height': '10vh',
     'padding': '10px',
     'margin': '5px',
-    'background-color': onemorning[1],
+    'background-color': "#" + onemorning[1],
     'border-radius': '10px'
 }
 
@@ -77,7 +77,7 @@ ALBUM_CARD_STYLE = {
     'max-height': '30vh',
     'padding': '10px',
     'margin': '5px',
-    'background-color': onemorning[1],
+    'background-color': "#" + onemorning[1],
     'border-radius': '10px'
 }
 
@@ -147,7 +147,14 @@ class GraphPlus(dbc.Container):
         self.children = [
             dcc.Graph(
                 id=self.base_id,
-                style={'height': f'{self._vh} vh', 'width': f'{self._vw} vw'},
+                style={
+                    'height': f'{self._vh} vh',
+                    'min-height': f'{self._vh} vh',
+                    'max-height': f'{self._vh} vh',
+                    'width': f'{self._vw} vw',
+                    'min-width': f'{self._vw} vw',
+                    'max-width': f'{self._vw} vw'
+                },
                 figure=Figure(layout=Layout(**LAYOUT_STYLE))
             ),
             dcc.Store(id=f'{self.base_id}_custom_data'),
@@ -424,11 +431,13 @@ main_layout = dbc.Container([
             Options(
                 id='entity_options',
                 title='Entity',
+                default_option=2,
                 options=ENTITY_OPTIONS
             )
         ])
     ], justify='center'),
     dbc.Row([
+        dbc.Col([], width=3),
         dbc.Col([
             dbc.Input(
                 id='search_text',
@@ -444,7 +453,8 @@ main_layout = dbc.Container([
             dbc.Button([
                 html.H5('Search')
             ], color='secondary', id='search_button')
-        ])
+        ]),
+        dbc.Col([], width=3)
     ]),
     dbc.Row([
         dbc.Col([
@@ -457,8 +467,9 @@ main_layout = dbc.Container([
         dbc.Col([
             GraphPlus(
                 id='music_relationship_plot',
-                vw=90,
-                show_selection=True
+                vh=95, vw=95,
+                show_selection=True,
+                fluid=True
             )
         ])
     ])
