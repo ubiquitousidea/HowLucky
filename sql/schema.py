@@ -1,24 +1,24 @@
 from util import load_yaml
 
 
-DB_CHOICE = 'postgres'
-SCHEMA_NAME = 'public'  # postgresql
+DB_CHOICE = "postgres"
+SCHEMA_NAME = "public"  # postgresql
 
 # historial price data table
-MARKETPLACE_TABLE = 'marketplace'
-SEARCH_TABLE = 'search'
+MARKETPLACE_TABLE = "marketplace"
+SEARCH_TABLE = "search"
 # node tables
-RELEASE_TABLE = 'releases'
-ARTIST_TABLE = 'artists'
-LABEL_TABLE = 'labels'
+RELEASE_TABLE = "releases"
+ARTIST_TABLE = "artists"
+LABEL_TABLE = "labels"
 
 # edge tables
-E_ARTIST_RELEASE = 'artist_release'
-E_LABEL_RELEASE = 'label_release'
+E_ARTIST_RELEASE = "artist_release"
+E_LABEL_RELEASE = "label_release"
 
 # views
-PRICES_VIEW = 'prices'
+PRICES_VIEW = "prices"
 
 
-DB_KEYS_POSTGRES = load_yaml('keys/database_postgres.yaml')
-DB_KEYS_MYSQL = load_yaml('keys/database_mysql_root.yaml')
+DB_KEYS_POSTGRES = load_yaml("keys/database_postgres.yaml")
+# DB_KEYS_MYSQL = load_yaml('keys/database_mysql_root.yaml')
