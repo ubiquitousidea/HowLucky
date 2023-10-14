@@ -424,6 +424,7 @@ class SearchResult(dbc.Card):
 #     ])
 # ], fluid=True, id='main_container', style=MAIN_STYLE)
 
+
 main_layout = dbc.Container([
     html.H1('Collection Analyser 2.0.0', style={'color': 'white'}),
     dbc.Row([
