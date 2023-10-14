@@ -1,0 +1,1 @@
+alter table public.releases add column format_details text;
