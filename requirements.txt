@@ -1,7 +1,8 @@
-pandas
-numpy
-dash
-dash-bootstrap-components
-plotly
-psycopg2
-python3-discogs-client
+pyyaml~=6.0.1
+pandas~=2.1.1
+numpy~=1.26.1
+dash~=2.14.0
+dash-bootstrap-components~=1.5.0
+plotly~=5.17.1
+psycopg2~=2.9.9
+python3-discogs-client~=2.7
