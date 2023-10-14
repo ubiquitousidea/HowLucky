@@ -5,3 +5,4 @@ keys
 R
 *.pyc
 .DS_Store
+.vscode
