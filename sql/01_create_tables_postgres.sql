@@ -26,6 +26,7 @@ CREATE TABLE IF NOT EXISTS public.releases
     format text COLLATE pg_catalog."default",
     catno character varying(32) COLLATE pg_catalog."default",
     image text COLLATE pg_catalog."default",
+    format_details text collate pg_catalog."default",
     CONSTRAINT releases_pkey PRIMARY KEY (release_id)
 )
 
