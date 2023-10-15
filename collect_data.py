@@ -11,14 +11,12 @@ parser.add_argument(
     "--store_meta",
     help="store metadata for each release",
     action="store_true",
-    type=bool,
     default=False,
 )
 parser.add_argument(
     "--store_prices",
     help="if 1, store prices, else dont",
     action="store_true",
-    type=bool,
     default=True,
 )
 
