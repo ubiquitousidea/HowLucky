@@ -1,7 +1,5 @@
 from sql.schema import *
 from database.data_extractors import *
-
-# from database.database_util_mysql import DBMySQL
 from database.database_util_postgres import DBPostgreSQL
 
 
@@ -9,22 +7,7 @@ from database.database_util_postgres import DBPostgreSQL
 # - Database storage functions ------------------------------------------------
 # -----------------------------------------------------------------------------
 def get_db_object(db, noisy=False):
-    """
-    :param db: str, postgres or mysql
-    :param noisy: if True, print database being used
-    :return: BaseDB object
-    """
-    if db == "postgres":
-        if noisy:
-            print(f"USING POSTGRES {DB_KEYS_POSTGRES['dbname']}")
-        _db = DBPostgreSQL(DB_KEYS_POSTGRES)
-    elif db == "mysql":
-        if noisy:
-            print(f"USING MYSQL DATABASE {DB_KEYS_MYSQL['database']}")
-        _db = DBMySQL(DB_KEYS_MYSQL)
-    else:
-        raise ValueError(f"unknown database {db}")
-    return _db
+    return
 
 
 def store_release_metadata(db, release):
@@ -49,7 +32,7 @@ def store_release_metadata(db, release):
     return None
 
 
-def store_release_data(release, store_metadata=True, store_prices=True, db=DB_CHOICE):
+def store_release_data(db, release, store_metadata=True, store_prices=True):
     """
     store the marketplace stats and release info for a release
     :param release: Release object
@@ -60,13 +43,12 @@ def store_release_data(release, store_metadata=True, store_prices=True, db=DB_CH
     """
     assert isinstance(release, discogs_client.Release), f"release is {type(release)}"
     print(f"Storing marketplace data for: {release.title} by {release.artists[0].name}")
-    _db = get_db_object(db)
     if store_prices:
         marketplace_data = prepare_price_data(release)
-        _db.insert_rows(marketplace_data, MARKETPLACE_TABLE)
+        db.insert_rows(marketplace_data, MARKETPLACE_TABLE)
     if store_metadata:
         try:
-            store_release_metadata(_db, release)
+            store_release_metadata(db, release)
         except:
             pass
     return None
@@ -78,29 +60,26 @@ def store_release_data(release, store_metadata=True, store_prices=True, db=DB_CH
 # -----------------------------------------------------------------------------
 
 
-def get_price_data(db=DB_CHOICE, **conditions):
+def get_price_data(db, **conditions):
     """
     get marketplace data from the local database for releases matching certain conditions
     :param db: str, which database to use (mysql or postgres)
     :return: pandas data frame
     """
-    _db = get_db_object(db)
-    df = _db.read_rows(PRICES_VIEW, **conditions)
+    df = db.read_rows(PRICES_VIEW, **conditions)
     df = df.sort_values(["release_id", "when"])
-    # print(df.columns)
     df["country"].fillna("-", inplace=True)
     df["lowest_price"] = df["lowest_price"].astype(float)
     return df
 
 
-def get_metadata(entity, db=DB_CHOICE, **conditions):
-    _db = get_db_object(db)
+def get_metadata(db, entity, **conditions):
     if entity == "label":
-        output = _db.read_rows(LABEL_TABLE, **conditions)
+        output = db.read_rows(LABEL_TABLE, **conditions)
     elif entity == "artist":
-        output = _db.read_rows(ARTIST_TABLE, **conditions)
+        output = db.read_rows(ARTIST_TABLE, **conditions)
     elif entity == "album":
-        output = _db.read_rows(RELEASE_TABLE, **conditions)
+        output = db.read_rows(RELEASE_TABLE, **conditions)
     else:
-        output = _db.read_rows(entity, **conditions)
+        output = db.read_rows(entity, **conditions)
     return output
