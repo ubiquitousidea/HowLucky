@@ -7,17 +7,19 @@ import argparse
 
 
 parser = argparse.ArgumentParser()
+
 parser.add_argument(
     "--store_meta",
     help="store metadata for each release",
     action="store_true",
     default=False,
 )
+
 parser.add_argument(
-    "--store_prices",
-    help="if 1, store prices, else dont",
-    action="store_true",
-    default=True,
+    "--sleep",
+    help="expected value of sleep time (exponential distribution)",
+    type=float,
+    default=5,
 )
 
 args = parser.parse_args()
@@ -34,9 +36,6 @@ while True:
     for clx in (collection, wantlist):
         for item in Randomize(clx):
             store_release_data(
-                db=db,
-                release=item.release,
-                store_metadata=args.store_meta,
-                store_prices=args.store_prices,
+                db=db, release=item.release, store_metadata=args.store_meta
             )
-            sleep_random()
+            sleep_random(args.sleep)

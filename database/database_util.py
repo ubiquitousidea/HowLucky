@@ -32,7 +32,7 @@ def store_release_metadata(db, release):
     return None
 
 
-def store_release_data(db, release, store_metadata=True, store_prices=True):
+def store_release_data(db, release, store_metadata):
     """
     store the marketplace stats and release info for a release
     :param release: Release object
@@ -43,18 +43,12 @@ def store_release_data(db, release, store_metadata=True, store_prices=True):
     """
     assert isinstance(release, discogs_client.Release), f"release is {type(release)}"
     print(f"Storing marketplace data for: {release.title} by {release.artists[0].name}")
-    if store_prices:
-        marketplace_data = prepare_price_data(release)
-        db.insert_rows(marketplace_data, MARKETPLACE_TABLE)
+    marketplace_data = prepare_price_data(release)
+    db.insert_rows(marketplace_data, MARKETPLACE_TABLE)
     if store_metadata:
-        try:
-            store_release_metadata(db, release)
-        except:
-            pass
-    return None
+        store_release_metadata(db, release)
 
 
-#
 # -----------------------------------------------------------------------------
 # - Database retrieval functions ----------------------------------------------
 # -----------------------------------------------------------------------------

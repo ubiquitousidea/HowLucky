@@ -30,9 +30,9 @@ def write_yaml(data, fname):
     :param fname: yaml output file name
     :return: None
     """
-    if not fname.lower().endswith('yaml'):
-        fname = fname.split('.')[0] + '.yaml'
-    with open(fname, 'w') as stream:
+    if not fname.lower().endswith("yaml"):
+        fname = fname.split(".")[0] + ".yaml"
+    with open(fname, "w") as stream:
         yaml.dump(data, stream, Dumper=Dumper)
     return None
 
@@ -55,6 +55,7 @@ class Randomize(object):
     """
     a class for iterating in a random order
     """
+
     def __init__(self, iterable, limit=None):
         self.iterable = iterable
         self._n = len(self.iterable)
@@ -69,15 +70,16 @@ class Randomize(object):
             yield self.iterable[i]
 
 
-def sleep_random(quiet=False):
+def sleep_random(beta=2, quiet=False):
     """
     sleep for a random time (exponential distributed)
+    :param beta: expected value
     :param quiet: if False, print the sleep time before sleeping
     :return: None
     """
-    n = 1 + exponential(2, 1)[0]
+    n = 1 + exponential(beta, 1)[0]
     if not quiet:
-        print(f'sleeping {round(n, 2)} seconds')
+        print(f"sleeping {round(n, 2)} seconds")
     time.sleep(n)
     return None
 
@@ -88,16 +90,18 @@ def just_try(func):
     :param func: function to be decorated
     :return: function that returns blank string if call fails
     """
+
     def wrapper(*args, **kwargs):
         try:
             return func(*args, **kwargs)
         except Exception as e:
             return None
+
     return wrapper
 
 
-
 # - Color operations -
+
 
 def opposite_color(path):
     """
@@ -106,5 +110,3 @@ def opposite_color(path):
     """
     average_color = array(Image.open(path)).mean(axis=0).mean(axis=0)
     return array([255, 255, 255]) - average_color
-
-
