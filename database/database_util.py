@@ -1,13 +1,5 @@
 from sql.schema import *
 from database.data_extractors import *
-from database.database_util_postgres import DBPostgreSQL
-
-
-# -----------------------------------------------------------------------------
-# - Database storage functions ------------------------------------------------
-# -----------------------------------------------------------------------------
-def get_db_object(db, noisy=False):
-    return
 
 
 def store_release_metadata(db, release):

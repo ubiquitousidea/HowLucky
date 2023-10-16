@@ -11,7 +11,7 @@ def get_factor(attribute, traces, custom_data_labels):
     :return: list of unique values of colname among the selected points in traces
     """
     var_index = where(array(custom_data_labels) == attribute)[0][0]
-    values = [point['customdata'][var_index] for point in traces['points']]
+    values = [point["customdata"][var_index] for point in traces["points"]]
     values = list(set(values))
     condition = {attribute: values}
     return condition
@@ -39,12 +39,17 @@ class ClickState(object):
         """
 
         output = pd.DataFrame(self._entities).assign(clicks=self._clicks)
-        output = output[output['clicks'].notna()]
+        output = output[output["clicks"].notna()]
         output = output.assign(keep=lambda x: x.clicks % 2 == 1)
-        output = output[output['keep']]
+        output = output[output["keep"]]
         try:
-            output = output.groupby('field').agg({'value': lambda x: list(x)}).reset_index().to_dict('records')
-            output = {item['field']: item['value'] for item in output}
+            output = (
+                output.groupby("field")
+                .agg({"value": lambda x: list(x)})
+                .reset_index()
+                .to_dict("records")
+            )
+            output = {item["field"]: item["value"] for item in output}
         except KeyError:
             output = {}
 
