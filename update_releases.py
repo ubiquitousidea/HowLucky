@@ -15,45 +15,46 @@ from pandas import DataFrame
 parser = argparse.ArgumentParser()
 
 parser.add_argument(
-    '--format_details',
-    help='update release format details for releases already in table',
-    type=int, default=0
+    "--format_details",
+    help="update release format details for releases already in table",
+    action="store_true",
+    default=False,
 )
 parser.add_argument(
-    '--find_missing',
-    help='find missing releases present in marketplace data but not release table',
-    type=int, default=0
+    "--find_missing",
+    help="find missing releases present in marketplace data but not release table",
+    action="store_true",
+    default=False,
 )
 parser.add_argument(
-    '--artist_url',
-    help='find missing artist image urls or update them when they change',
-    type=int, default=0
+    "--artist_url",
+    help="find missing artist image urls or update them when they change",
+    action="store_true",
+    default=False,
 )
 parser.add_argument(
-    '--release_url',
-    help='find missing release image urls or update them when they change',
-    type=int, default=0
+    "--release_url",
+    help="find missing release image urls or update them when they change",
+    action="store_true",
+    default=False,
 )
 args = parser.parse_args()
 
 db = get_db_object(DB_CHOICE)
 
 if args.format_details:
-    update_field('releases', 'release_id', 'format_details', db_=db)
+    update_field("releases", "release_id", "format_details", db_=db)
 elif args.find_missing:
-    r = db.read_rows('releases')
-    m = db.read_rows('unique_releases')
-    missing_releases = set(m['release_id']) - set(r['release_id'])
+    r = db.read_rows("releases")
+    m = db.read_rows("unique_releases")
+    missing_releases = set(m["release_id"]) - set(r["release_id"])
     for release_id in sorted(list(missing_releases)):
-        release = get_entity(release_id, 'release_id')
+        release = get_entity(release_id, "release_id")
         store_release_metadata(db, release)
         sleep_random()
 elif args.artist_url:
-    update_field('artists', 'artist_id', 'image', db_=db)
+    update_field("artists", "artist_id", "image", db_=db)
 elif args.release_url:
-    update_field('releases', 'release_id', 'image', db_=db)
+    update_field("releases", "release_id", "image", db_=db)
 else:
     pass
-
-
-

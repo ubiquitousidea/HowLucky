@@ -70,7 +70,7 @@ class Randomize(object):
             yield self.iterable[i]
 
 
-def sleep_random(beta=2, quiet=False):
+def sleep_random(beta=60, quiet=False):
     """
     sleep for a random time (exponential distributed)
     :param beta: expected value
