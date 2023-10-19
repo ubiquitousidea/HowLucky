@@ -21,8 +21,8 @@ app.layout = main_layout  # page_layout
 )
 def add_pictures(_):
     return (
-        html.Img(src=get_asset_url("giantsteps.jpg")),
-        html.Img(src=get_asset_url("sunshine.jpg")),
+        html.Img(src=get_asset_url("giantsteps.jpg"), className="img-fluid"),
+        html.Img(src=get_asset_url("sunshine.jpg"), className="img-fluid"),
     )
 
 
