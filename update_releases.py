@@ -3,13 +3,12 @@ update the releases table
 """
 
 import argparse
-from database.database_util import get_metadata, get_db_object, store_release_metadata
+from database.database_util import get_metadata, store_release_metadata
+from database.database_util_postgres import DBPostgreSQL
 from discogs_search import get_entity, get_attribute
 from scripts.update_field import update_field
-from sql.schema import DB_CHOICE
-from database.data_extractors import get_release_text, get_image_url
+from sql.schema import DB_KEYS_POSTGRES
 from util import sleep_random
-from pandas import DataFrame
 
 
 parser = argparse.ArgumentParser()
@@ -40,7 +39,7 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
-db = get_db_object(DB_CHOICE)
+db = DBPostgreSQL(DB_KEYS_POSTGRES)
 
 if args.format_details:
     update_field("releases", "release_id", "format_details", db_=db)
