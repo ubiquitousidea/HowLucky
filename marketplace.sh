@@ -1,0 +1,1 @@
+/home/ubuntu/.conda/envs/howlucky/bin/python collect_data.py --sleep 90
