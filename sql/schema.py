@@ -16,6 +16,21 @@ LABEL_TABLE = "labels"
 E_ARTIST_RELEASE = "artist_release"
 E_LABEL_RELEASE = "label_release"
 
+ALL_TABLES = [
+    MARKETPLACE_TABLE,
+    RELEASE_TABLE,
+    ARTIST_TABLE,
+    LABEL_TABLE,
+    E_ARTIST_RELEASE,
+    E_LABEL_RELEASE
+]
+
+ALL_ENT = [
+    'artist',
+    'label',
+    'release'
+]
+
 # views
 PRICES_VIEW = "prices"
 

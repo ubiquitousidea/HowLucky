@@ -12,6 +12,7 @@ from database.database_util_postgres import DBPostgreSQL
 from sql.schema import DB_KEYS_POSTGRES, LABEL_TABLE, ARTIST_TABLE, RELEASE_TABLE
 import re
 import time
+from dashboard.image_cache import ImageCache
 
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
@@ -36,19 +37,20 @@ def update_dropdown_options(n1, n2, n3):
     if btn is None:
         raise PreventUpdate
     tbl_name = re.search(r'(\w+)_btn', btn).group(1)
+    entity = re.sub(r'(\w+)s', r'\1', tbl_name)
     name_col = 'title' if tbl_name == 'releases' else 'name'
-    id_col = f'{tbl_name[:-1]}_id'
+    id_col = f'{entity}_id'
     tbl = DB.read_rows(tbl_name)
     tbl = tbl.sort_values(name_col).reset_index(drop=True)
     options = [
-        {'label': row[name_col], 'value': row[id_col]} 
+        {'label': row[name_col], 'value': {'id': row[id_col], 'name': row[name_col]}} 
         for idx, row in 
         tbl.iterrows()]
     return (
         options, 
         None, 
-        f'Select a {tbl_name[:-1].title()}',
-        {'table': tbl_name, 'key': name_col, 'id_col': id_col})
+        f'Select a {entity.title()}',
+        {'entity': entity})
 
 
 @callback(
@@ -59,24 +61,24 @@ def update_dropdown_options(n1, n2, n3):
 def show_image(v, d):
     if not v:
         raise PreventUpdate
-    table_name = d['table']
-    name_col = d['key']
-    id_col = d['id_col']
-    output = DB._query(
-        f"select image, {name_col} "
-        f"from public.{table_name} "
-        f"where {id_col} = {v};")
-    image_url = output[0][0]
-    name = output[0][1]
+    
+    entity = d['entity']
+    image_url = ImageCache().get_image(entity, v['id'])
+    
+    # table_name = f'{entity}s'
+    # name_col = 'title' if table_name == 'releases' else 'name'
+    # id_col = f'{entity}_id'
+    # output = DB._query(
+    #     f"select image, {name_col} "
+    #     f"from public.{table_name} "
+    #     f"where {id_col} = {v};")
+    # image_url = output[0][0]
+    # name = output[0][1]
+    
     return html.Img(
         src=image_url, 
-        alt=f'Picture of {name}', 
-        className='img-fluid')
-
-
-
-
-
+        alt=f"Picture of {v['name']}", 
+        className="img-fluid")
 
 if __name__ == "__main__":
     app.run(port=8069, debug=False)
