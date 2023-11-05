@@ -41,6 +41,17 @@ class DBPostgreSQL(BaseDB):
             'password': self.password
         }
 
+    def _query(self, q):
+        """
+        DANGER!
+        execute any query, no validation is performed
+        """
+        with psycopg2.connect(**self.credentials) as conn:
+            cur = conn.cursor()
+            cur.execute(q)
+            return cur.fetchall()
+        
+
     def insert_rows(self, df, tbl, returning=None):
         """
         Write rows of dataframe 'df' to the database table 'tbl'
