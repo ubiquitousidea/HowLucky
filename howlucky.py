@@ -1,5 +1,3 @@
-from app import app
+from app import server
 
-assert app
-
-app.run()
+server.run()

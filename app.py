@@ -13,9 +13,10 @@ from sql.schema import DB_KEYS_POSTGRES, LABEL_TABLE, ARTIST_TABLE, RELEASE_TABL
 import re
 import time
 from dashboard.image_cache import ImageCache
+from flask import Flask
 
-
-app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+server = Flask()
+app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], server=server)
 app.title = " Vinyl Collection Analyser"
 app.layout = main_layout
 
