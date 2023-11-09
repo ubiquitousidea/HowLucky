@@ -25,7 +25,6 @@ DB = DBPostgreSQL(DB_KEYS_POSTGRES)
 
 @callback(
     Output('main_dropdown', 'options'),
-    Output('main_dropdown', 'value'),
     Output('main_dropdown', 'placeholder'),
     Output('dropdown_entity', 'data'),
     Input('labels_btn', 'n_clicks'),
@@ -48,9 +47,18 @@ def update_dropdown_options(n1, n2, n3):
         tbl.iterrows()]
     return (
         options, 
-        None, 
         f'Select a {entity.title()}',
         {'entity': entity})
+
+
+@app.callback(
+    Output('main_dropdown', 'value'),
+    Input('labels_btn', 'n_clicks'),
+    Input('artists_btn', 'n_clicks'),
+    Input('releases_btn', 'n_clicks')
+)
+def afffffff(_, __, ___):
+    pass
 
 
 @callback(
@@ -58,27 +66,53 @@ def update_dropdown_options(n1, n2, n3):
     Input('main_dropdown', 'value'),
     State('dropdown_entity', 'data')
 )
-def show_image(v, d):
+def show_card(v, d):
     if not v:
         raise PreventUpdate
-    
     entity = d['entity']
     image_url = ImageCache().get_image(entity, v['id'])
     
-    # table_name = f'{entity}s'
-    # name_col = 'title' if table_name == 'releases' else 'name'
-    # id_col = f'{entity}_id'
-    # output = DB._query(
-    #     f"select image, {name_col} "
-    #     f"from public.{table_name} "
-    #     f"where {id_col} = {v};")
-    # image_url = output[0][0]
-    # name = output[0][1]
+    if entity == 'artist':
+        artist = dclient.artist(v['id'])
+        main_text = artist.profile
+    elif entity == 'label':
+        label = dclient.label(v['id'])
+        main_text = label.profile
+    elif entity == 'release':
+        release = dclient.release(v['id'])
+        main_text = release.notes
+    else:
+        raise ValueError(f'Unknown entity {entity}')
     
-    return html.Img(
-        src=image_url, 
-        alt=f"Picture of {v['name']}", 
-        className="img-fluid")
+    sub_entity = {
+        'artist': 'release', 
+        'label': 'artist', 
+        'release': 'release'}.get(entity)
+    button_id = {
+        'entity': entity, 
+        'id': v['id'], 
+        'desired_entity': sub_entity}
+    output = dbc.Card([
+        dbc.CardHeader(html.H2(v['name'])),
+        dbc.CardBody([
+            dbc.Row([
+                dbc.Col([
+                    html.Img(
+                        src=image_url,
+                        alt=f"Picture of {v['name']}",
+                        className='img-fluid'
+                    )
+                ], width=5),
+                dbc.Col([
+                    html.P(main_text, style={'max-height': '500px', 'overflowY': 'auto'})
+                ], width=7)
+            ]),
+        ]),
+        dbc.CardFooter([
+            dbc.Button([f'See {sub_entity}s'], id=button_id, color='info')
+        ], class_name='text-center')
+    ], class_name='entity_card')
+    return output
 
 if __name__ == "__main__":
-    app.run(port=8069, debug=False)
+    app.run(port=8099, debug=False)

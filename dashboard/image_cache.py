@@ -3,6 +3,7 @@
 from database.database_util_postgres import DBPostgreSQL
 from sql.schema import DB_KEYS_POSTGRES, ALL_TABLES, ALL_ENT
 from urllib.request import urlretrieve
+from urllib.error import HTTPError
 from dash import get_asset_url
 import os
 import os.path
@@ -19,10 +20,13 @@ class ImageCache(object):
     def cache_image(self, url, entity, id_val):
         image_ext = url.split('.')[-1]
         assert image_ext.lower() in ('jpg', 'jpeg')
-        local_file_name, headers = urlretrieve(
-            url, f'assets/{entity}/{id_val}.jpg')
-        logging.info('downloaded image from discogs')
-        return local_file_name
+        try:
+            local_file_name, headers = urlretrieve(
+                url, f'assets/{entity}/{id_val}.jpg')
+            logging.info('downloaded image from discogs')
+            return local_file_name
+        except HTTPError:
+            return
 
     def get_discogs_image_url(self, entity, id_val):
         tbl, id_col = self.get_table_name(entity)
@@ -39,7 +43,6 @@ class ImageCache(object):
         return tbl_name, id_col
 
     def get_image(self, entity, id_val):
-        tbl_name, id_col = self.get_table_name(entity)
         try:
             image_path = f'assets/{entity}/{id_val}.jpg'
             assert os.path.isfile(image_path)
