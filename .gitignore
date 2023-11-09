@@ -7,3 +7,4 @@ R
 .DS_Store
 .vscode
 assets
+nginx.dash.conf
