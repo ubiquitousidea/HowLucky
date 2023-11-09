@@ -15,7 +15,8 @@ import time
 from dashboard.image_cache import ImageCache
 from flask import Flask
 
-server = Flask()
+
+server = Flask(__name__)
 app = Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP], server=server)
 app.title = " Vinyl Collection Analyser"
 app.layout = main_layout
