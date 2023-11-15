@@ -53,16 +53,6 @@ def update_dropdown_options(n1, n2, n3):
         {'entity': entity})
 
 
-@app.callback(
-    Output('main_dropdown', 'value'),
-    Input('labels_btn', 'n_clicks'),
-    Input('artists_btn', 'n_clicks'),
-    Input('releases_btn', 'n_clicks')
-)
-def afffffff(_, __, ___):
-    pass
-
-
 @callback(
     Output('image_area', 'children'),
     Input('main_dropdown', 'value'),
@@ -106,13 +96,13 @@ def show_card(v, d):
                     )
                 ], width=5),
                 dbc.Col([
-                    html.P(main_text, style={'max-height': '500px', 'overflowY': 'auto'})
+                    html.P(main_text, style={'max-height':'230px','overflow-y': 'auto'})
                 ], width=7)
             ]),
         ]),
         dbc.CardFooter([
-            dbc.Button([f'See {sub_entity}s'], id=button_id, color='info')
-        ], class_name='text-center')
+            dbc.Button([f'See {sub_entity}s'], id=button_id, color='secondary')
+        ], class_name='entity_card_footer')
     ], class_name='entity_card')
     return output
 
