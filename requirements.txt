@@ -8,3 +8,4 @@ psycopg2-binary~=2.9.9
 python3-discogs-client~=2.7
 Pillow~=10.0.1
 gunicorn~=21.2.0
+python-box~=7.1.1

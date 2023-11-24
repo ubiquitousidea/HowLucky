@@ -10,7 +10,7 @@ def make_button(text, btn_id):
 
 main_layout = dbc.Container([
     dbc.Row([
-        html.H1('Vinyl Collection Analyser')
+        html.H1('Vinyl Collection Analyser', className='text-center page-cell')
     ]),
     dbc.Row([
         dbc.ButtonGroup([
@@ -24,7 +24,8 @@ main_layout = dbc.Container([
         dcc.Store(id='dropdown_entity')
     ], class_name='page_cell'),
     dbc.Row([
-        dbc.Col(id="image_area", width=6, md=12),
-        dbc.Col(id="info_area", width=6, md=12)
+        dbc.Col(id="column_1", width=12, lg=6),
+        dbc.Col(id="column_2", width=12, lg=6),
+        dbc.Col(id='column_3', width=12)
     ], class_name='page_cell')
 ], fluid=True, id='main_layout')

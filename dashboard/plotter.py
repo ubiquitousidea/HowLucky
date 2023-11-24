@@ -2,21 +2,31 @@ from plotly.graph_objects import Figure
 import plotly.express as px
 from database.database_util import get_price_data
 from datetime import datetime
+from database.database_util_postgres import DBPostgreSQL
+from sql.schema import DB_KEYS_POSTGRES
+
+
+DB = DBPostgreSQL(DB_KEYS_POSTGRES)
 
 
 LAYOUT_STYLE = dict(
-    paper_bgcolor='rgba(0,0,0,0)',
-    plot_bgcolor='rgba(0,0,0,0)',
-    font_color='#CCCCCC',
+    margin=dict(l=10, r=10, t=50, b=10),
+    legend=dict(
+        yanchor='top', xanchor='left',
+        x=.01, y=.99, font_color='white'
+    ),
+    paper_bgcolor='rgba(255,255,255,.5)',
+    plot_bgcolor='rgba(255,255,255,.5)',
+    font_color='black',
     font_size=18,
     xaxis_tickfont_size=12,
     yaxis_tickfont_size=12,
-    xaxis_tickfont_color='#CCCCCC',
-    yaxis_tickfont_color='#CCCCCC',
+    xaxis_tickfont_color='black',
+    yaxis_tickfont_color='black',
     xaxis_zeroline=False,
     yaxis_zeroline=False,
-    yaxis_gridcolor='#444444',
-    xaxis_gridcolor='#444444',
+    yaxis_gridcolor='#fff',
+    xaxis_gridcolor='#fff',
     clickmode='event+select',
     dragmode='select'
 )
@@ -49,7 +59,7 @@ def aggregate_prices(groupings, x_measure, y_measure, central_id, **conditions):
     :return: grouped data frame with price summary
     """
     return (
-        get_price_data(**conditions)
+        get_price_data(db=DB,**conditions)
         .groupby(groupings)
         .agg({
             'lowest_price': y_measure,
@@ -222,7 +232,7 @@ def make_timeseries_plot(color_var, y_var='lowest_price', **conditions):
     :param conditions:
     :return:
     """
-    df = get_price_data(**conditions)
+    df = get_price_data(db=DB, **conditions)
     # TODO: add a time series resampler for groups by catalog number (catno)
     # df = df.set_index('when').groupby([
     #     'catno', 'title', 'artist', 'year', 'artist_id',
@@ -249,7 +259,7 @@ def make_timeseries_plot(color_var, y_var='lowest_price', **conditions):
             'artist': 'Artist',
             'catno': 'Catalog Number'
         },
-        title="Album Prices over Time"
+        # title="Album Prices over Time"
     )
     fig.update_traces(
         hovertemplate=(
