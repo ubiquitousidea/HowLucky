@@ -16,7 +16,7 @@ with open(logfile, "r") as f:
     for line in lines:
         s = re.search(R0, line)
         ts = datetime.strptime(s.group(4).split(' ')[0], '%d/%b/%Y:%H:%M:%S')
-        current_date = current_date.replace(tzinfo=timezone.utc)
+        ts = ts.replace(tzinfo=timezone.utc)
         log_data.append({
             'ip': s.group(1),
             'timestamp': ts,
