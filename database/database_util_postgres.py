@@ -52,7 +52,7 @@ class DBPostgreSQL(BaseDB):
             return cur.fetchall()
         
 
-    def insert_rows(self, df, tbl, returning=None):
+    def insert_rows(self, df, tbl, schema=None, returning=None):
         """
         Write rows of dataframe 'df' to the database table 'tbl'
         :param df: pandas data frame
@@ -60,13 +60,15 @@ class DBPostgreSQL(BaseDB):
         :param returning:
         :return: None
         """
+        if schema is None:
+            schema = SCHEMA_NAME
         col_names = self._prepare_col_names(df)
         n_col = df.shape[1]
         fmt = ','.join(['%s'] * n_col)
         with psycopg2.connect(**self.credentials) as conn:
             cur = conn.cursor()
             for idx, row in df.iterrows():
-                query = f"INSERT INTO {SCHEMA_NAME}.{tbl}({col_names})\nVALUES ({fmt})\n"
+                query = f"INSERT INTO {schema}.{tbl}({col_names})\nVALUES ({fmt})\n"
                 query += f'RETURNING {returning}' if returning is not None else ''
                 query += f"ON CONFLICT DO NOTHING"
                 query = self._validate(query)
@@ -78,7 +80,7 @@ class DBPostgreSQL(BaseDB):
                     raise e
         return None
 
-    def update_rows(self, df, index_col, tbl):
+    def update_rows(self, df, index_col, tbl, schema=None):
         """
         update values in rows
         :param df: data frame of values to update
@@ -86,6 +88,8 @@ class DBPostgreSQL(BaseDB):
         :param tbl: table name
         :return: None
         """
+        if schema is None:
+            schema = SCHEMA_NAME
         df = df.set_index(index_col)
         with psycopg2.connect(**self.credentials) as conn:
             cur = conn.cursor()
@@ -93,18 +97,20 @@ class DBPostgreSQL(BaseDB):
             for idx, row in df.iterrows():
                 values = row.values
                 update_string = ','.join([f'{col_name} = %s' for col_name in col_names])
-                query = f'update {tbl} set {update_string} where {index_col} = {idx}'
+                query = f'update {schema}.{tbl} set {update_string} where {index_col} = {idx}'
                 cur.execute(query, values)
         return None
 
-    def read_rows(self, tbl, **conditions):
+    def read_rows(self, tbl, schema=None, **conditions):
         """
         read data from the database table tbl where conditions are true
         :param tbl: name of the database table
         :param conditions: keyword arguments of the form <column_name> = <value>
         :return: pandas data frame
         """
-        query = f"SELECT * FROM {SCHEMA_NAME}.{tbl} \n"
+        if schema is None:
+            schema = SCHEMA_NAME
+        query = f"SELECT * FROM {schema}.{tbl} \n"
         cond_values = None  # this name needs to be defined for cur.execute to run
         if len(conditions) > 0:
             cond_values = []

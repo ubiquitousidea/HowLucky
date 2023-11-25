@@ -1,8 +1,14 @@
+from database.database_util import DB_KEYS_POSTGRES
+from database.database_util_postgres import DBPostgreSQL
 from datetime import datetime
 import pandas as pd
 import re
+
+DB = DBPostgreSQL(DB_KEYS_POSTGRES)
+
 logfile = "/var/log/nginx/access.log"
 # logfile = "access.log"
+
 log_data = []
 R0 = r"^([\d.]+) (\S+) (\S+) \[([\w:/]+\s[+-]\d{4})\] \"(.+?)\" (\d{3}) (\d+) \"([^\"]+)\" \"(.+?)\""
 with open(logfile, "r") as f:
@@ -21,8 +27,11 @@ with open(logfile, "r") as f:
         
 log_data = pd.DataFrame(log_data)
 
-unique_ips = log_data.ip.drop_duplicates().values
-print({'unique_ips': unique_ips, 'n': len(unique_ips)})
+DB.insert_rows(df=log_data, tbl='nginx', schema='logs')
+unique_ips = log_data.ip.drop_duplicates().sort_values().values.tolist()
+
+print({'unique_ips': len(unique_ips)})
+print({'ips': unique_ips})
 
 
 
