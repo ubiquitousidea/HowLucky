@@ -13,7 +13,7 @@ LAYOUT_STYLE = dict(
     margin=dict(l=10, r=10, t=50, b=10),
     legend=dict(
         yanchor='top', xanchor='left',
-        x=.01, y=.99, font_color='white'
+        x=.01, y=.99, font_color='black'
     ),
     paper_bgcolor='rgba(255,255,255,.5)',
     plot_bgcolor='rgba(255,255,255,.5)',

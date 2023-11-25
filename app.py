@@ -153,12 +153,21 @@ def add_sub_cards(_):
                     ])
                 ]),
                 dbc.CardFooter([
-                    dbc.Button('Show Trends', id={
-                        'widget_type': 'graphit',
-                        'entity': 'release',
-                        'id': rel.release_id,
-                        'graph_type': 'prices_over_time'
-                    }, color='secondary')
+                    dbc.ButtonGroup([
+                        dbc.Button('Show Trends', id={
+                            'widget_type': 'graphit',
+                            'entity': 'release',
+                            'id': rel.release_id,
+                            'graph_type': 'timeseries'
+                        }, color='secondary'),
+                        dbc.Button([
+                            dcc.Link(
+                                'Buy on Discogs',
+                                href=f'https://www.discogs.com/sell/release/{rel.release_id}',
+                                target='_blank'
+                            )
+                        ], style={'background-color':'white'})
+                    ])
                 ], class_name='entity_card_footer')
             ], class_name='entity_card')
             for idx, rel in releases.iterrows()]
@@ -170,14 +179,14 @@ def add_sub_cards(_):
         'widget_type': 'graphit',
         'entity': 'release',
         'id': ALL,
-        'graph_type': 'prices_over_time'
+        'graph_type': 'timeseries'
     }, 'n_clicks')
 )
 def create_graphs(_):
     if all([item is None for item in _]):
         raise PreventUpdate
     caller = Box(callback_context.triggered_id)
-    if caller.graph_type == 'prices_over_time':
+    if caller.graph_type == 'timeseries':
         fig, cdata = make_timeseries_plot(
             color_var='artist',
             release_id=[caller.id])
@@ -187,7 +196,9 @@ def create_graphs(_):
             figure=fig, className='graph1', config=dict(displaylogo= False)
         )
         return dbc.Card([
-            dbc.CardHeader(html.H2('Prices over Time')),
+            dbc.CardHeader([
+                html.H2('Prices over Time'),
+            ]),
             dbc.CardBody(graph_element),
         ], class_name='graph-card')
 
