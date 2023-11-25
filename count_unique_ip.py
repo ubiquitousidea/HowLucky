@@ -1,6 +1,6 @@
 from database.database_util import DB_KEYS_POSTGRES
 from database.database_util_postgres import DBPostgreSQL
-from datetime import datetime
+from datetime import datetime, timezone
 import pandas as pd
 import re
 
@@ -15,9 +15,11 @@ with open(logfile, "r") as f:
     lines = f.readlines()
     for line in lines:
         s = re.search(R0, line)
+        ts = datetime.strptime(s.group(4).split(' ')[0], '%d/%b/%Y:%H:%M:%S')
+        current_date = current_date.replace(tzinfo=timezone.utc)
         log_data.append({
             'ip': s.group(1),
-            'timestamp': datetime.strptime(s.group(4).split(' ')[0], '%d/%b/%Y:%H:%M:%S'),
+            'timestamp': ts,
             'request': s.group(5),
             'status': s.group(6),
             'length': s.group(7),
