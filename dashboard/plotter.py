@@ -10,9 +10,9 @@ DB = DBPostgreSQL(DB_KEYS_POSTGRES)
 
 
 LAYOUT_STYLE = dict(
-    margin=dict(l=10, r=10, t=50, b=10),
+    margin=dict(l=10, r=10, t=10, b=10),
     legend=dict(
-        yanchor='top', xanchor='left',
+        yanchor='bottom', xanchor='left',
         x=.01, y=.99, font_color='black'
     ),
     paper_bgcolor='rgba(255,255,255,.5)',

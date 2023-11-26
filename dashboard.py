@@ -25,22 +25,22 @@ app.title = "Collection Analyser 2.0.0"
 app.layout = main_layout  # page_layout
 
 
-# @app.callback(
-#     Output('graph1', 'figure'),
-#     Output('graph1_custom_data', 'data'),
-#     Output('graph1_entity', 'data'),
-#     Input('analyze_button', 'n_clicks'),
-#     Input('axis_type', 'value'),
-#     Input('measure', 'value'))
-# def update_graph1(n, at, measure):
-#     if not n:
-#         raise PreventUpdate
-#     return make_artist_plot(
-#         x_measure=measure,
-#         y_measure=measure,
-#         loglog=('log' in at))
-#
-#
+@app.callback(
+    Output('graph1', 'figure'),
+    Output('graph1_custom_data', 'data'),
+    Output('graph1_entity', 'data'),
+    Input('analyze_button', 'n_clicks'),
+    Input('axis_type', 'value'),
+    Input('measure', 'value'))
+def update_graph1(n, at, measure):
+    if not n:
+        raise PreventUpdate
+    return make_artist_plot(
+        x_measure=measure,
+        y_measure=measure,
+        loglog=('log' in at))
+
+
 @app.callback(
     Output("music_relationship_plot", "figure"),
     Output("music_relationship_plot_custom_data", "data"),
@@ -61,60 +61,60 @@ def create_music_relationship_graph(card_clicks, y_var, card_data):
     return make_artist_plot()
 
 
-# @app.callback(
-#     Output('music_relationship_plot', 'figure'),
-#     Input({'type': 'button', 'entity': ALL}, 'n_clicks')
-# )
-# def create_music_relationship_graph(n_):
-#     pass
+@app.callback(
+    Output('music_relationship_plot', 'figure'),
+    Input({'type': 'button', 'entity': ALL}, 'n_clicks')
+)
+def create_music_relationship_graph(n_):
+    pass
 
 
-#
-#
-# @app.callback(Output('card_container', 'children'),
-#               Input('graph1', 'selectedData'),
-#               Input('search_box', 'value'),
-#               State('graph1_custom_data', 'data'),
-#               State('graph1_entity', 'data'))
-# def add_cards(traces, search, custom_data_columns, entity):
-#     """
-#     generate dash bootstrap cards to represent a selection of point
-#     :param traces: selected points
-#     :param custom_data_columns: list of col names stored in each points' customdata
-#     :param entity: name of the entity plotted on scatter plot
-#     :return: list of Cards
-#     """
-#     cards = []
-#     if traces is not None and traces['points'].__len__() > 0:
-#         entity = entity[0]
-#         col_name, color_var = ENTITY_MAP.get(entity)
-#         conditions = get_factor(col_name, traces, custom_data_columns)
-#         card_data = get_metadata(entity, **conditions)
-#         for idx, row in card_data.iterrows():
-#             cards.append(ArtistCard.from_row(row))
-#     if search:
-#         card_data = get_metadata('artist', name=[search])
-#         cards.append(ArtistCard.from_row(card_data.iloc[0]))
-#     return cards
-#
-#
-# @app.callback(Output('release_card_col', 'children'),
-#               Input('graph2', 'clickData'),
-#               State('graph2_custom_data', 'data'))
-# def show_release_card(clickdata, customdata):
-#     """
-#     Create album card when user clicks a point on graph2
-#     :param clickdata: clickData property of graph 2
-#     :param customdata: list of column names stored in custom data of graph 2 points
-#     :return: list of 1 album card
-#     """
-#     if not clickdata:
-#         raise PreventUpdate
-#     conditions = get_factor('release_id', clickdata, customdata)
-#     cards = []
-#     for idx, row in get_metadata('last_price', **conditions).iterrows():
-#         cards.append(AlbumCard.from_row(row))
-#     return cards
+
+
+@app.callback(Output('card_container', 'children'),
+              Input('graph1', 'selectedData'),
+              Input('search_box', 'value'),
+              State('graph1_custom_data', 'data'),
+              State('graph1_entity', 'data'))
+def add_cards(traces, search, custom_data_columns, entity):
+    """
+    generate dash bootstrap cards to represent a selection of point
+    :param traces: selected points
+    :param custom_data_columns: list of col names stored in each points' customdata
+    :param entity: name of the entity plotted on scatter plot
+    :return: list of Cards
+    """
+    cards = []
+    if traces is not None and traces['points'].__len__() > 0:
+        entity = entity[0]
+        col_name, color_var = ENTITY_MAP.get(entity)
+        conditions = get_factor(col_name, traces, custom_data_columns)
+        card_data = get_metadata(entity, **conditions)
+        for idx, row in card_data.iterrows():
+            cards.append(ArtistCard.from_row(row))
+    if search:
+        card_data = get_metadata('artist', name=[search])
+        cards.append(ArtistCard.from_row(card_data.iloc[0]))
+    return cards
+
+
+@app.callback(Output('release_card_col', 'children'),
+              Input('graph2', 'clickData'),
+              State('graph2_custom_data', 'data'))
+def show_release_card(clickdata, customdata):
+    """
+    Create album card when user clicks a point on graph2
+    :param clickdata: clickData property of graph 2
+    :param customdata: list of column names stored in custom data of graph 2 points
+    :return: list of 1 album card
+    """
+    if not clickdata:
+        raise PreventUpdate
+    conditions = get_factor('release_id', clickdata, customdata)
+    cards = []
+    for idx, row in get_metadata('last_price', **conditions).iterrows():
+        cards.append(AlbumCard.from_row(row))
+    return cards
 
 
 @app.callback(
