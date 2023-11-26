@@ -6,5 +6,8 @@ R
 *.pyc
 .DS_Store
 .vscode
-assets
+assets/artist
+assets/label
+assets/release
+assets/*.jpg
 nginx.dash.conf

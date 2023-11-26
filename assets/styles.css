@@ -1,0 +1,69 @@
+h1 {
+    color: #fff;
+    opacity: 50%;
+    font-size: 5vw;
+    font-weight: bolder;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+h2 {
+    color: lightcoral;
+    opacity: 50%;
+    font-size: 2em;
+    font-weight: bold;
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+.page_cell{
+    margin-top: 5px;
+    margin-bottom: 5px;
+    max-width: 1600px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#main_dropdown {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+.button_text {
+    font-size: 32px;
+    opacity: 50%;
+    color: white;
+    margin: 0px;
+}
+
+#main_layout{
+    background-color: #222;
+    /* background-image: url('sunshine.jpg'); */
+    /* background-blend-mode: lighten; */
+    background-size: cover;
+    height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+}
+.graph1 {
+    width: 100%;
+    height: 100%;
+}
+.graph-card{
+    border-radius: 20px;
+    height: 350px;
+}
+
+.entity_card {
+    /* max-width: 500px; */
+    /* min-width: 250px; */
+    width: 100%;
+    border-radius: 20px;
+    /* height: 350px; */
+    margin-bottom: 10px;
+}
+
+.entity_card_footer {
+    text-align: right;
+}
+
+.bio_text {
+    max-height: 150px;
+    overflow-y: auto;
+}
