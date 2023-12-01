@@ -4,6 +4,7 @@ from dash import html, dcc, get_asset_url
 from discogs_identity import dclient
 from database.database_util_postgres import DBPostgreSQL
 from sql.schema import DB_KEYS_POSTGRES
+from dashboard.plotter import make_timeseries_plot
 
 
 DB = DBPostgreSQL(DB_KEYS_POSTGRES)
@@ -35,8 +36,12 @@ MAIN_LAYOUT = dbc.Container([
         dcc.Store(id='dropdown_entity')
     ], class_name='page_cell'),
     dbc.Row([
-        dbc.Col(id="column_1", width=12, lg=6),
-        dbc.Col(id="column_2", width=12, lg=6),
+        # dbc.Container(id="column_1", fluid=True),
+        # dbc.Container(id="column_2", fluid=True),
+        # dbc.Container(id="column_3", fluid=True),
+        
+        dbc.Col(id="column_1", width=12),
+        dbc.Col(id="column_2", width=12),
         dbc.Col(id='column_3', width=12)
     ], class_name='page_cell')
 ], fluid=True, id='main_layout')
@@ -80,6 +85,7 @@ def make_release_card(rel):
     # create a release card using information from the local database
     # rel: row from the prices view of the vinyl database
     im = ImageCache()
+    # print(rel)
     return dbc.Card([
         dbc.CardHeader(html.H2(f'{rel.title} ({rel.catno})')),
         dbc.CardBody([
@@ -91,9 +97,9 @@ def make_release_card(rel):
                     )
                 ], width=4),
                 dbc.Col([
-                    html.P(f'by {rel.artist}'),
-                    html.P(f"{rel.label} ({rel.country} {rel.year if rel.year else ''})"),
-                    html.P(f"{rel.num_for_sale} for sale from {rel.lowest_price}")
+                    html.P(f'by {rel.artist}', className='release_text'),
+                    html.P(f"{rel.label} ({rel.country} {rel.year if rel.year else ''})", className='release_text'),
+                    html.P(f"{rel.num_for_sale} for sale from {rel.currency}{rel.lowest_price}", className='release_text')
                 ], width=8)
             ])
         ]),
@@ -115,3 +121,27 @@ def make_release_card(rel):
             ])
         ], class_name='entity_card_footer')
     ], class_name='entity_card')
+
+
+
+def make_graph_card(release_id, y_var='lowest_price'):
+    
+    fig, cdata = make_timeseries_plot(
+        color_var='artist', 
+        y_var=y_var, 
+        release_id=release_id)
+    
+    graph_element = dcc.Graph(
+        figure=fig, className='graph1', 
+        config=dict(displaylogo=False))
+    
+    return dbc.Card([
+        dbc.CardHeader([html.H2('Prices over Time')]),
+        dbc.CardBody(graph_element),
+        dbc.CardFooter(dbc.RadioItems(
+            options=[
+                {'label': 'Lowest Price', 'value': 'lowest_price'},
+                {'label': 'Number for Sale', 'value': 'num_for_sale'}
+            ], value='lowest_price', inline=True
+        ))
+    ], class_name='graph-card')

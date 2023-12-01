@@ -4,6 +4,7 @@ from database.database_util import get_price_data
 from datetime import datetime
 from database.database_util_postgres import DBPostgreSQL
 from sql.schema import DB_KEYS_POSTGRES
+import pandas as pd
 
 
 DB = DBPostgreSQL(DB_KEYS_POSTGRES)
@@ -13,7 +14,7 @@ LAYOUT_STYLE = dict(
     margin=dict(l=10, r=10, t=10, b=10),
     legend=dict(
         yanchor='bottom', xanchor='left',
-        x=.01, y=.99, font_color='black'
+        x=.01, y=.01, font_color='black'
     ),
     paper_bgcolor='rgba(255,255,255,.5)',
     plot_bgcolor='rgba(255,255,255,.5)',
@@ -233,16 +234,35 @@ def make_timeseries_plot(color_var, y_var='lowest_price', **conditions):
     :return:
     """
     df = get_price_data(db=DB, **conditions)
-    # TODO: add a time series resampler for groups by catalog number (catno)
-    # df = df.set_index('when').groupby([
-    #     'catno', 'title', 'artist', 'year', 'artist_id',
-    #     'release_id', 'label', 'label_id', 'country'
-    # ]).resample('1D').mean().reset_index()
+    df = df.assign(when=pd.to_datetime(df.when, utc=True).dt.tz_localize(None))
+    release_versions = (
+        df[['release_id', 'title', 'catno', 'year', 'country',
+            'master_id', 'artist', 'artist_id', 'label', 'label_id']]
+        .drop_duplicates()
+        .reset_index(drop=True)
+    )
+    df_list = []
+    for r in release_versions.release_id:
+        df_list.append(
+            df[df.release_id.eq(r)]
+            .set_index('when')
+            .resample('24H')
+            .agg({
+                'lowest_price': 'min',
+                'num_for_sale': 'max'
+            })
+            .reset_index()
+            .assign(release_id=r)
+        )
+    df_agg = (
+        pd.concat(df_list, axis=0)
+        .merge(release_versions, on='release_id')
+    )
     custom_data = [
         'catno', 'title', 'artist', 'num_for_sale', 'lowest_price', 'year',
         'artist_id', 'release_id', 'label', 'label_id', 'country']
     fig = px.line(
-        df,
+        df_agg,
         x='when',
         y=y_var,
         line_group='release_id',
@@ -282,7 +302,8 @@ def make_timeseries_plot(color_var, y_var='lowest_price', **conditions):
 
 
 
-
+def newplot(df):
+    pass
 
 
 
