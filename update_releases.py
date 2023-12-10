@@ -56,9 +56,12 @@ elif args.find_missing:
     for release_id in sorted(list(missing_releases)):
         if args.debug:
             print(release_id)
-        release = get_entity(release_id, "release_id")
-        store_release_metadata(db, release)
-        sleep_random()
+        try:
+            release = get_entity(release_id, "release_id")
+            store_release_metadata(db, release)
+            sleep_random()
+        except:
+            pass
 elif args.artist_url:
     update_field("artists", "artist_id", "image", db_=db)
 elif args.release_url:
