@@ -37,6 +37,12 @@ parser.add_argument(
     action="store_true",
     default=False,
 )
+parser.add_argument(
+    '--debug',
+    help='turn on debug output',
+    action='store_true',
+    default=False
+)
 args = parser.parse_args()
 
 db = DBPostgreSQL(DB_KEYS_POSTGRES)
@@ -48,6 +54,8 @@ elif args.find_missing:
     m = db.read_rows("unique_releases")
     missing_releases = set(m["release_id"]) - set(r["release_id"])
     for release_id in sorted(list(missing_releases)):
+        if args.debug:
+            print(release_id)
         release = get_entity(release_id, "release_id")
         store_release_metadata(db, release)
         sleep_random()
